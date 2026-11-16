@@ -6,7 +6,7 @@ public enum EstadoReserva {
     CANCELADA,
     FINALIZADA;
 
-    // metodo para pasar de string a enum. si recibe un string vacio o nullo entonces retora null
+    // metodo para pasar de string a enum. Si recibe un string vacio o nulo entonces retora null
     public EstadoReserva fromString(String strestadoreserva){
         if(strestadoreserva == null || strestadoreserva.isEmpty() )return null;
 
