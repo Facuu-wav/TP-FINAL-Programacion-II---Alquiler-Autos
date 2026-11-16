@@ -6,7 +6,7 @@ public abstract class Usuario {
     private int id;
     private String nombre;
     private String apellido;
-    private int dni;
+    private String dni;
     private String nombreUsuario;
     private String email;
     private String contrasenia;
