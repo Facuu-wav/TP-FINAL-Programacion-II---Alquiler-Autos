@@ -17,7 +17,6 @@ public class Vehiculo {
     private EstadoVehiculo estadoVehiculo;
     private BigDecimal precioPorDia;
 
-
     /// Constructor/es
 
     /// Métodos
