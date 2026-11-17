@@ -7,7 +7,7 @@ public enum EstadoVehiculo {
     EN_MANTENIMIENTO,
     EN_LIMPIEZA;
 
-    // metodo para pasar de string a enum. si recibe un string vacio o nullo entonces retora null
+    // metodo para pasar de string a enum. si recibe un string vacio o nulo entonces retora null
     public EstadoVehiculo fromString(String strestadovehiculo){
         if(strestadovehiculo == null || strestadovehiculo.isEmpty() )return null;
 
