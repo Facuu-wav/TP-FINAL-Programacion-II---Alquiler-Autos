@@ -2,7 +2,7 @@ package clases;
 
 public abstract class Usuario {
 
-    /// Atributos
+    // ----------------------------------------------------------|Atributos|----------------------------------------------------------
     private int id;
     private String nombre;
     private String apellido;
@@ -11,7 +11,7 @@ public abstract class Usuario {
     private String email;
     private String contrasenia;
 
-    /// Constructor/es
+    // ----------------------------------------------------------|Constructor/es|----------------------------------------------------------
     public Usuario(int id, String nombre, String apellido, String dni, String nombreUsuario, String email, String contrasenia) {
         this.id = id;
         this.nombre = nombre;
@@ -22,7 +22,7 @@ public abstract class Usuario {
         this.contrasenia = contrasenia;
     }
 
-    //getters
+    //----------------------------------------------------------|Getters|----------------------------------------------------------
     public int getId() {
         return id;
     }
@@ -51,7 +51,33 @@ public abstract class Usuario {
         return contrasenia;
     }
 
+    //----------------------------------------------------------|Setters|----------------------------------------------------------
 
-    /// Métodos
+    public void setContrasenia(String contrasenia) {
+        this.contrasenia = contrasenia;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public void setNombreUsuario(String nombreUsuario) {
+        this.nombreUsuario = nombreUsuario;
+    }
+
+    public void setDni(String dni) {
+        this.dni = dni;
+    }
+
+    public void setApellido(String apellido) {
+        this.apellido = apellido;
+    }
+
+    public void setNombre(String nombre) {
+        this.nombre = nombre;
+    }
+
+
+    //----------------------------------------------------------|Métodos|----------------------------------------------------------
 
 }
