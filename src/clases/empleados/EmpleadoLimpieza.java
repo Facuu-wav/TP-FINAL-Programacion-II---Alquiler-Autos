@@ -1,5 +1,6 @@
-package clases;
+package clases.empleados;
 
+import clases.Vehiculo;
 import enums.EstadoVehiculo;
 
 import java.math.BigDecimal;

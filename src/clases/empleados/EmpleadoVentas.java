@@ -1,10 +1,6 @@
-package clases;
-
-import enums.EstadoReserva;
+package clases.empleados;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
 
 public class EmpleadoVentas extends Empleado {
 

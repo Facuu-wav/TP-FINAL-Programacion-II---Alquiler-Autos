@@ -1,4 +1,4 @@
-package clases;
+package clases.empleados;
 
 import java.math.BigDecimal;
 

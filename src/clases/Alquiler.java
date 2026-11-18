@@ -1,5 +1,6 @@
 package clases;
 
+import clases.empleados.Usuario;
 import enums.EstadoAlquiler;
 
 import java.time.LocalDateTime;
