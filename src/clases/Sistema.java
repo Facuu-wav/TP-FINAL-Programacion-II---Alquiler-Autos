@@ -4,6 +4,7 @@ import clases.empleados.Usuario;
 import excepciones.AccesoDenegadoEx;
 import excepciones.ContraseniaIncorrectaEx;
 import excepciones.UsuarioNoEncontradoEx;
+import sql.BDHandler;
 
 public class Sistema {
 
@@ -22,13 +23,13 @@ public class Sistema {
     // Gestión de usuarios del sistema
     public Usuario iniciarSesion(String nombreUsuario, String contrasenia) throws UsuarioNoEncontradoEx, ContraseniaIncorrectaEx {
 
-        Usuario usuario = DBHandler.buscarUsuario(nombreUsuario);
+        Usuario usuario = BDHandler.buscarUsuario(nombreUsuario);
 
         if (usuario == null) {
             throw new UsuarioNoEncontradoEx("El usuario no existe.");
         }
 
-        if (!DBHandler.verificarContrasenia(contrasenia, usuario.getContrasenia())) {
+        if (!BDHandler.verificarContrasenia(contrasenia, usuario.getContrasenia())) {
             throw new ContraseniaIncorrectaEx("La contraseña es incorrecta.");
         }
 
