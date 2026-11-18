@@ -1,6 +1,6 @@
 package clases.empleados;
 
-import enums.tipoUsuario;
+import enums.TipoUsuario;
 
 public abstract class Usuario {
 
@@ -12,7 +12,7 @@ public abstract class Usuario {
     private String nombreUsuario;
     private String email;
     private String contrasenia;
-    private tipoUsuario tipoUsuario;
+    private TipoUsuario tipoUsuario;
 
     // ----------------------------------------------------------|Constructor/es|----------------------------------------------------------
     public Usuario(int id, String nombre, String apellido, String dni, String nombreUsuario, String email, String contrasenia) {
