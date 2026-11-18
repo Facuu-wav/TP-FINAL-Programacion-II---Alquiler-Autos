@@ -7,6 +7,7 @@ import java.sql.*;
 
 public class BDHandler {
 
+    /// WALLY CUANDO HAGAMOS LA BASE DE DATOS HAY QUE ACTUALIZAR ESTO!!!
     private static final String url = "jdbc:sqlite:database.db";
 
     // Consultas de usuarios
