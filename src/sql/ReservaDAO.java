@@ -12,7 +12,7 @@ import java.time.LocalDateTime;
 
 public class ReservaDAO {
 
-    private final String RESERVA_POR_ID = "SELECT * FROM reserva WHERE id = ?";
+    private static final String RESERVA_POR_ID = "SELECT * FROM reserva WHERE id = ?";
 
     //--> Metodo para buscar RESERVA_POR_ID RETORNANDO EL OBJETO ENCONTRADO.
     public Reserva reservaPorId(int idbuscado) throws SQLException, IdNoExistenteEx{
@@ -24,35 +24,35 @@ public class ReservaDAO {
             ps.setInt(1, idbuscado);
 
             try(ResultSet rs = ps.executeQuery()) {
-                while (rs.next()) {
-                    if (rs.getInt("id") == idbuscado) {
-                        int id = rs.getInt("id");
+                if (rs.next()) {
+                    int id = rs.getInt("id");
 
-                        Cliente cliente = rs.getString("cliente");
+                    Cliente cliente = rs.getString("cliente");
 
-                        Vehiculo vehiculo = rs.getString("vehiculo");
+                    //-> obtenemos el vehiculo en particular de la reserva mediante su clave foranea
+                    Vehiculo vehiculo = VehiculoDAO.vehiculoPorId(rs.getInt("vehiculo_id"));
 
-                        //-> Mediante la clave foranea accedemos al usuario exacto que hizo la reserva
-                        Usuario usuario = UsuarioDAO.usuarioPorId(rs.getInt("id_usuario"));
+                    //-> Mediante la clave foranea accedemos al usuario exacto que hizo la reserva
+                    Usuario usuario = UsuarioDAO.usuarioPorId(rs.getInt("id_usuario"));
 
-                        LocalDateTime fechareserva = rs.getTimestamp("fecha_reserva");
+                    LocalDateTime fechareserva = rs.getTimestamp("fecha_reserva").toLocalDateTime();
 
-                        LocalDateTime fechaInicio = rs.getTimestamp("fecha_inicio").toLocalDateTime();
+                    LocalDateTime fechaInicio = rs.getTimestamp("fecha_inicio").toLocalDateTime();
 
-                        LocalDateTime fechafin = rs.getTimestamp("fecha_fin").toLocalDateTime();
+                    LocalDateTime fechafin = rs.getTimestamp("fecha_fin").toLocalDateTime();
 
-                        EstadoReserva estadoreserva = EstadoReserva.fromString
-                                (rs.getString("estado_reserva"));
+                    EstadoReserva estadoreserva = EstadoReserva.fromString
+                            (rs.getString("estado_reserva"));
 
-                        reserva = new Reserva(id, cliente, vehiculo, usuario, fechareserva, fechaInicio, fechafin, estadoreserva);
-                    }
+                    reserva = new Reserva(id, cliente, vehiculo, usuario, fechareserva, fechaInicio, fechafin, estadoreserva);
+
                 }
 
-                if (reserva == null) trow new IdNoExistenteEx("ERROR: Ingresar un id existente.");
+                if (!rs.next()){
+                    trow new IdNoExistenteEx("ERROR: Ingresar un id existente.");
+                }
 
             }
-        }catch (SQLException | IdNoExistenteEx e){
-            e.printStackTrace();
         }
 
         return reserva;

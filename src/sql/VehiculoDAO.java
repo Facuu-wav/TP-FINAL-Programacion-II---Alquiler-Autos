@@ -1,10 +1,17 @@
 package sql;
 
+import clases.Cliente;
+import clases.Reserva;
+import clases.Vehiculo;
+import clases.empleados.Usuario;
+import enums.EstadoReserva;
 import enums.EstadoVehiculo;
 import enums.Marca;
+import excepciones.IdNoExistenteEx;
 
 import java.math.BigDecimal;
 import java.sql.*;
+import java.time.LocalDateTime;
 
 public class VehiculoDAO {
 
@@ -13,6 +20,10 @@ public class VehiculoDAO {
 
     private static final String DELETE_VEHICULO =
             "DELETE FROM vehiculo WHERE id = ?";
+
+    private static final String VEHICULO_POR_ID =
+            "SELECT * FROM reserva WHERE id = ?";
+
 
     public static int agregarVehiculoBDD(String patente, Marca marca, String modelo, int anio, int kilometraje, EstadoVehiculo estadoVehiculo, BigDecimal precioPorDia) throws SQLException {
 
@@ -58,6 +69,48 @@ public class VehiculoDAO {
 
     public static void cambiarEstadoVehiculo() {
 
+    }
+
+    //--> Metodo para buscar RESERVA_POR_ID RETORNANDO EL OBJETO ENCONTRADO.
+    public static Vehiculo vehiculoPorId(int idbuscado) throws SQLException, IdNoExistenteEx {
+        Vehiculo vehiculo = null;
+
+        try(Connection connection = DBHandler.getConnection()){
+            PreparedStatement ps = connection.prepareStatement(VEHICULO_POR_ID);
+
+            ps.setInt(1, idbuscado);
+
+            try(ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    int id = rs.getInt("id");
+
+                    String patente = rs.getString("patente");
+
+                    Marca marca = Marca.fromString
+                            (rs.getString("marca"));
+
+                    String modelo = rs.getString("modelo");
+
+                    int anio = rs.getInt("anio");
+
+                    int kilometraje = rs.getInt("kilometraje");
+
+                    EstadoVehiculo estadoVehiculo = EstadoVehiculo.fromString
+                            (rs.getString("estado_vehiculo"));
+
+                    BigDecimal precioPorDia = rs.getBigDecimal("precio_por_dia");
+
+                    vehiculo = new Vehiculo(id, patente, marca, modelo, anio, kilometraje,  estadoVehiculo, precioPorDia);
+                }
+
+                if (!rs.next()) {
+                    trow new IdNoExistenteEx("ERROR: Ingresar un id existente.");
+                }
+
+            }
+        }
+
+        return vehiculo;
     }
 
 }

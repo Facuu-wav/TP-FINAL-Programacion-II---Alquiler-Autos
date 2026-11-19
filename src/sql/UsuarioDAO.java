@@ -72,7 +72,10 @@ public class UsuarioDAO {
 
                     }
                 }
-                if (usuario == null) trow new IdNoExistenteEx("ERROR: Ingresar un id existente.");
+
+                if (!rs.next()) {
+                    trow new IdNoExistenteEx("ERROR: Ingresar un id existente.");
+                }
 
             } catch (SQLException | IdNoExistenteEx e) {
                 e.printStackTrace();
