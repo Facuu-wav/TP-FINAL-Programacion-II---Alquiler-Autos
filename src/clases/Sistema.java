@@ -1,12 +1,16 @@
 package clases;
 
 import clases.empleados.Usuario;
+import enums.EstadoVehiculo;
+import enums.Marca;
 import enums.TipoUsuario;
 import excepciones.AccesoDenegadoEx;
 import excepciones.ContraseniaIncorrectaEx;
 import excepciones.UsuarioNoEncontradoEx;
-import sql.BDHandler;
+import sql.DBHandler;
+import sql.VehiculoDAO;
 
+import java.math.BigDecimal;
 import java.sql.SQLException;
 import java.util.HashSet;
 
@@ -21,7 +25,7 @@ public class Sistema {
     public Sistema() {
         this.reservas = new Gestor<>();
         this.alquileres = new Gestor<>();
-        this.vehiculos = new HashSet<>(); // vehiculos debería ser hashset?
+        this.vehiculos = new HashSet<>();
     }
 
     /// Métodos
@@ -29,7 +33,7 @@ public class Sistema {
     // Gestión de usuarios del sistema
     public Usuario iniciarSesion(String nombreUsuario, String contrasenia) throws SQLException, UsuarioNoEncontradoEx, ContraseniaIncorrectaEx {
 
-        Usuario usuario = BDHandler.buscarUsuario(nombreUsuario);
+        Usuario usuario = DBHandler.buscarUsuario(nombreUsuario);
 
         if (usuario == null) {
             throw new UsuarioNoEncontradoEx("El usuario no existe.");
@@ -65,15 +69,24 @@ public class Sistema {
     }
 
     // Gestión de vehículos
-    public void agregarVehiculo(Usuario usuario) throws AccesoDenegadoEx {
+    public String agregarVehiculo(Usuario usuario, String patente, Marca marca, String modelo, int anio, int kilometraje, EstadoVehiculo estadoVehiculo, BigDecimal precioPorDia) throws AccesoDenegadoEx, SQLException {
 
+        /// REVISAR ESTO
         TipoUsuario tipo = usuario.getTipoUsuario();
 
-        if (!tienePermiso(usuario, TipoUsuario.ADMINISTRADOR, TipoUsuario.EMPLEADO_VENTAS)) {
+        if (!tienePermiso(usuario, TipoUsuario.ADMINISTRADOR)) {
             throw new AccesoDenegadoEx("Acceso denegado.");
         }
+        ///
 
-        vehiculos.add(vehiculo);
+        int idGenerada = VehiculoDAO.agregarVehiculoBDD(patente, marca, modelo, anio, kilometraje, estadoVehiculo, precioPorDia);
+
+        if (idGenerada != -1) {
+            Vehiculo vehiculo = new Vehiculo(idGenerada, patente, marca, modelo, anio, kilometraje, estadoVehiculo, precioPorDia);
+            vehiculos.add(vehiculo);
+            return "Se agregó correctamente el vehículo.";
+        }
+        return "No se pudo agregar el vehículo";
     }
 
     // Gestión de reservas

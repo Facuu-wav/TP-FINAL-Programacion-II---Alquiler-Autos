@@ -15,7 +15,7 @@ public class VehiculoDAO {
 
         int idGenerada = -1;
 
-        try (Connection conn = BDHandler.getConnection(); PreparedStatement ps = conn.prepareStatement(INSERT_VEHICULO, Statement.RETURN_GENERATED_KEYS)) {
+        try (Connection conn = DBHandler.getConnection(); PreparedStatement ps = conn.prepareStatement(INSERT_VEHICULO, Statement.RETURN_GENERATED_KEYS)) {
 
             ps.setString(1, patente);
             ps.setString(2, marca.name()); // Utilizo name() en lugar de toString() porque devuelve excatamente el nombre declarado en el enum.

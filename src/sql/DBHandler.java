@@ -5,7 +5,7 @@ import enums.TipoUsuario;
 
 import java.sql.*;
 
-public class BDHandler {
+public class DBHandler {
 
     /// WALLY CUANDO HAGAMOS LA BASE DE DATOS HAY QUE ACTUALIZAR ESTO!!!
     private static final String URL = "jdbc:sqlite:database.db";

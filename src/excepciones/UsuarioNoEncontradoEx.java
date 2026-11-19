@@ -1,6 +1,6 @@
 package excepciones;
 
-public class UsuarioNoEncontradoEx extends RuntimeException {
+public class UsuarioNoEncontradoEx extends Exception {
     public UsuarioNoEncontradoEx(String message) {
         super(message);
     }
