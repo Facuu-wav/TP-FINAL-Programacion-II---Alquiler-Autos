@@ -15,7 +15,7 @@ public class UsuarioDAO {
 
     private static final String USUARIO_POR_ID = "SELECT * FROM usuario WHERE id = ?";
 
-    //--> Metodo para buscar USUARIO_POR_ID retornando el objeto encontrado.
+    //||OBTENER_USUARIO_ID||--> Metodo para buscar USUARIO_POR_ID retornando el objeto encontrado. //PENTDIENTE A REFACTORIZAR
     public static Usuario usuarioPorId(int idbuscado) throws SQLException, IdNoExistenteEx {
         Usuario usuario = null;
 
