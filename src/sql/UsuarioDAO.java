@@ -1,5 +1,6 @@
 package sql;
 
+import clases.empleados.Usuario;
 import clases.empleados.*;
 import enums.TipoUsuario;
 import excepciones.IdNoExistenteEx;

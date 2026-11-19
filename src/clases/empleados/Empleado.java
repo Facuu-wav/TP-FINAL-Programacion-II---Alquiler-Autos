@@ -1,7 +1,6 @@
 package clases.empleados;
 
 import enums.TipoUsuario;
-import interfaces.IObtenerID;
 
 import java.math.BigDecimal;
 

@@ -1,17 +1,12 @@
 package sql;
 
-import clases.Cliente;
-import clases.Reserva;
 import clases.Vehiculo;
-import clases.empleados.Usuario;
-import enums.EstadoReserva;
 import enums.EstadoVehiculo;
 import enums.Marca;
 import excepciones.IdNoExistenteEx;
 
 import java.math.BigDecimal;
 import java.sql.*;
-import java.time.LocalDateTime;
 
 public class VehiculoDAO {
 

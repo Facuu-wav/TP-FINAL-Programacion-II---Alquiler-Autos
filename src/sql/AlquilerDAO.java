@@ -4,12 +4,9 @@ import clases.Alquiler;
 import clases.Reserva;
 import clases.empleados.Usuario;
 import enums.EstadoAlquiler;
-import enums.EstadoReserva;
-import enums.EstadoVehiculo;
 import excepciones.IdNoExistenteEx;
 
 import java.sql.*;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 
