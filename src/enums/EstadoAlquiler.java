@@ -2,7 +2,7 @@ package enums;
 
 public enum EstadoAlquiler {
     ACTIVO,
-    FINALIZADO
+    FINALIZADO;
 
     // metodo para pasar de string a enum. si recibe un string vacio o nulo entonces retora null
     public static EstadoAlquiler fromString(String strestadoalquiler){

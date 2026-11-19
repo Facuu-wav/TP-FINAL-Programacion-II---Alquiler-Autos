@@ -14,7 +14,10 @@ public abstract class Usuario {
     private String contrasenia;
     private TipoUsuario tipoUsuario;
 
+
+
     // ----------------------------------------------------------|Constructor/es|----------------------------------------------------------
+
     public Usuario(int id, String nombre, String apellido, String dni, String nombreUsuario, String email, String contrasenia, TipoUsuario tipoUsuario) {
         this.id = id;
         this.nombre = nombre;

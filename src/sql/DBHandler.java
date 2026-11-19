@@ -11,7 +11,9 @@ public class DBHandler {
     private static final String URL = "jdbc:sqlite:database.db";
 
     public static Connection getConnection() throws SQLException {
-        return DriverManager.getConnection(URL);
+        Connection connection = DriverManager.getConnection(URL);
+        connection.createStatement().execute("PRAGMA foreign_keys = ON");
+        return connection;
     }
 
     // Consultas de usuarios
@@ -47,13 +49,13 @@ public class DBHandler {
                                 return new Administrador();
 
                             case EMPLEADO:
-                                return  new Empleado();
+                                //return  new Empleado();
 
                             case EMPLEADO_LIMPIEZA:
                                 return new EmpleadoLimpieza();
 
                             case EMPLEADO_MANTENIMIENTO:
-                                return new EmpleadoMantenimiento();
+                                //return new EmpleadoMantenimiento();
 
                             case EMPLEADO_VENTAS:
                                 return new EmpleadoVentas();

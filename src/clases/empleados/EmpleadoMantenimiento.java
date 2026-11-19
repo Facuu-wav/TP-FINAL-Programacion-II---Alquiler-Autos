@@ -2,6 +2,7 @@ package clases.empleados;
 
 import clases.Vehiculo;
 import enums.EstadoVehiculo;
+import enums.TipoUsuario;
 
 import java.math.BigDecimal;
 
@@ -9,9 +10,10 @@ public class EmpleadoMantenimiento extends Empleado {
 
     //----------------------------------------------------------|Constructor/es|----------------------------------------------------------
 
-    public EmpleadoMantenimiento(int id, String nombre, String apellido, String dni, String nombreUsuario, String email, String contrasenia, int legajo, BigDecimal pagoporhora, int horastrabajadas) {
-        super(id, nombre, apellido, dni, nombreUsuario, email, contrasenia, legajo, pagoporhora, horastrabajadas);
+    public EmpleadoMantenimiento(int id, String nombre, String apellido, String dni, String nombreUsuario, String email, String contrasenia, TipoUsuario tipoUsuario, int legajo, BigDecimal pagoporhora, int horastrabajadas) {
+        super(id, nombre, apellido, dni, nombreUsuario, email, contrasenia, tipoUsuario, legajo, pagoporhora, horastrabajadas);
     }
+
 
     //----------------------------------------------------------|Metodos|----------------------------------------------------------
 

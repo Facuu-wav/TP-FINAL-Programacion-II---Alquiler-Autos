@@ -11,7 +11,8 @@ import java.sql.*;
 import java.time.LocalDateTime;
 
 public class ReservaDAO {
-    private final String RESERVA_POR_ID = "SELECT * FROM reserva WHILE id = ?";
+
+    private final String RESERVA_POR_ID = "SELECT * FROM reserva WHERE id = ?";
 
     //--> Metodo para buscar RESERVA_POR_ID RETORNANDO EL OBJETO ENCONTRADO.
     public Reserva reservaPorId(int idbuscado) throws SQLException, IdNoExistenteEx{
@@ -31,7 +32,8 @@ public class ReservaDAO {
 
                         Vehiculo vehiculo = rs.getString("vehiculo");
 
-                        Usuario usuario = rs.getString("usuario");
+                        //-> Mediante la clave foranea accedemos al usuario exacto que hizo la reserva
+                        Usuario usuario = UsuarioDAO.usuarioPorId(rs.getInt("id_usuario"));
 
                         LocalDateTime fechareserva = rs.getTimestamp("fecha_reserva");
 
