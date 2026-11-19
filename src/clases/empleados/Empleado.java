@@ -1,7 +1,6 @@
 package clases.empleados;
 
 import enums.TipoEmpleado;
-import enums.TipoUsuario;
 
 import java.math.BigDecimal;
 
@@ -10,20 +9,18 @@ public class Empleado extends Usuario {
 
     private TipoEmpleado tipoEmpleado;
     private int legajo;
-    private BigDecimal pagoporhora;
-    private int horastrabajadas;
-
+    private BigDecimal pagoPorHora;
+    private int horasTrabajadas;
 
     //----------------------------------------------------------|constructores|----------------------------------------------------------
 
-    public Empleado(int id, String nombre, String apellido, String dni, String nombreUsuario, String email, String contrasenia, TipoEmpleado tipoEmpleado, int legajo, BigDecimal pagoporhora, int horastrabajadas) {
+    public Empleado(int id, String nombre, String apellido, String dni, String nombreUsuario, String email, String contrasenia, TipoEmpleado tipoEmpleado, int legajo, BigDecimal pagoPorHora, int horasTrabajadas) {
         super(id, nombre, apellido, dni, nombreUsuario, email, contrasenia);
         this.tipoEmpleado = tipoEmpleado;
         this.legajo = legajo;
-        this.pagoporhora = pagoporhora;
-        this.horastrabajadas = horastrabajadas;
+        this.pagoPorHora = pagoPorHora;
+        this.horasTrabajadas = horasTrabajadas;
     }
-
 
     //----------------------------------------------------------|Getters|----------------------------------------------------------
 
@@ -37,7 +34,7 @@ public class Empleado extends Usuario {
     }
 
 
-    //----------------------------------------------------------|Metodos|----------------------------------------------------------
+    //----------------------------------------------------------|Métodos|----------------------------------------------------------
 
 
 }

@@ -3,22 +3,23 @@ package clases;
 import clases.empleados.Administrador;
 import clases.empleados.Empleado;
 import clases.empleados.Usuario;
-import enums.EstadoVehiculo;
-import enums.Marca;
-import enums.TipoEmpleado;
-import enums.TipoUsuario;
+import enums.*;
 import excepciones.AccesoDenegadoEx;
 import excepciones.ContraseniaIncorrectaEx;
+import excepciones.ObjetoNoExisteEx;
 import excepciones.UsuarioNoEncontradoEx;
 import sql.*;
 
 import java.math.BigDecimal;
 import java.sql.SQLException;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 
 public class Sistema {
 
     /// Atributos
+    private Usuario usuarioActual;
     private Gestor<Cliente>  clientes;
     private Gestor<Vehiculo> vehiculos;
     private Gestor<Usuario>  usuarios;
@@ -27,6 +28,7 @@ public class Sistema {
 
     /// Constructor/es
     public Sistema() {
+        this.usuarioActual = null;
         this.clientes   = new Gestor<>();
         this.vehiculos  = new Gestor<>();
         this.usuarios   = new Gestor<>();
@@ -37,54 +39,25 @@ public class Sistema {
     /// Métodos
 
     /// Gestión de usuarios del sistema
-    public Usuario iniciarSesion(String nombreUsuario, String contrasenia) throws SQLException, UsuarioNoEncontradoEx, ContraseniaIncorrectaEx {
+    // Este método valida que un usuario exista dentro del sistema.
+    public Usuario iniciarSesion(String nombreUsuario, String contrasenia) throws SQLException, ObjetoNoExisteEx, ContraseniaIncorrectaEx {
 
-        Usuario usuario = DBHandler.buscarUsuario(nombreUsuario);
+        Usuario usuario = UsuarioDAO.buscarUsuario(nombreUsuario);
 
-        if (usuario == null) {
-            throw new UsuarioNoEncontradoEx("El usuario no existe.");
+        if (!usuarioExiste(usuario)) {
+            throw new ObjetoNoExisteEx("El usuario no existe.");
         }
 
         if (!usuario.getContrasenia().equals(contrasenia)) {
             throw new ContraseniaIncorrectaEx("La contraseña es incorrecta.");
         }
 
+        this.usuarioActual = usuario;
         return usuario;
     }
 
-    // REVISAR
-    public String agregarUsuarioAdministrador() throws AccesoDenegadoEx {
-
-        // validaciones y excepciones acá
-
-        int idGenerada = UsuarioDAO.agregarUsuarioAdministradorBDD();
-
-        if (idGenerada != -1) {
-            Administrador administrador = new Administrador();
-            usuarios.agregar(administrador);
-            return "Se agregó correctamente el administrador.";
-        }
-        return "No se pudo agregar el administrador.";
-    }
-
-    public String agregarEmpleado(Usuario usuario) throws AccesoDenegadoEx {
-
-        if (!esAdministrador(usuario)) {
-            throw new AccesoDenegadoEx("Acceso denegado.");
-        }
-
-        int idGenerada = UsuarioDAO.agregarEmpleado();
-
-        if (idGenerada != -1) {
-            Empleado empleado = new Empleado();
-            usuarios.agregar(empleado);
-            return "Se agregó correctamente el empleado.";
-        }
-        return "No se pudo agregar el empleado";
-    }
-
-    public void mostrarPermisos() {
-
+    public void cerrarSesion() {
+        this.usuarioActual = null;
     }
 
     private boolean usuarioExiste(Usuario usuario) {
@@ -99,10 +72,42 @@ public class Sistema {
         return usuario instanceof Empleado empleado && empleado.getTipoEmpleado() == tipoEmpleado;
     }
 
-    /// Gestión de clientes
-    public String agregarCliente(Usuario usuario) throws AccesoDenegadoEx {
+    public String agregarAdministrador(String nombre, String apellido, String dni, String nombreUsuario, String email, String contrasenia) throws AccesoDenegadoEx {
 
-        if (!esAdministrador(usuario)) {
+        if (!esAdministrador(usuarioActual)) {
+            throw new AccesoDenegadoEx("Acceso denegado.");
+        }
+
+        int idGenerada = UsuarioDAO.agregarAdministradorBDD(nombre, apellido, dni, nombreUsuario, email, contrasenia);
+
+        if (idGenerada != -1) {
+            Administrador administrador = new Administrador(idGenerada, nombre, apellido, dni, nombreUsuario, email, contrasenia);
+            usuarios.agregar(administrador);
+            return "Se agregó correctamente el administrador.";
+        }
+        return "No se pudo agregar el administrador.";
+    }
+
+    public String agregarEmpleado(String nombre, String apellido, String dni, String nombreUsuario, String email, String contrasenia, TipoEmpleado tipoEmpleado, int legajo, BigDecimal pagoPorHora, int horasTrabajadas) throws UsuarioNoEncontradoEx, AccesoDenegadoEx {
+
+        if (!esAdministrador(usuarioActual)) {
+            throw new AccesoDenegadoEx("Acceso denegado.");
+        }
+
+        int idGenerada = UsuarioDAO.agregarEmpleadoBDD(nombre, apellido, dni, nombreUsuario, email, contrasenia, tipoEmpleado, legajo, pagoPorHora, horasTrabajadas);
+
+        if (idGenerada != -1) {
+            Empleado empleado = new Empleado(idGenerada, nombre, apellido, dni, nombreUsuario, email, contrasenia, tipoEmpleado, legajo, pagoPorHora, horasTrabajadas);
+            usuarios.agregar(empleado);
+            return "Se agregó correctamente el empleado.";
+        }
+        return "No se pudo agregar el empleado";
+    }
+
+    /// Gestión de clientes
+    public String agregarCliente() throws UsuarioNoEncontradoEx, AccesoDenegadoEx {
+
+        if (!esAdministrador(usuarioActual)) {
             throw new AccesoDenegadoEx("Acceso denegado.");
         }
 
@@ -117,9 +122,9 @@ public class Sistema {
     }
 
     /// Gestión de vehículos
-    public String agregarVehiculo(Usuario usuario, String patente, Marca marca, String modelo, int anio, int kilometraje, EstadoVehiculo estadoVehiculo, BigDecimal precioPorDia) throws AccesoDenegadoEx, SQLException {
+    public String agregarVehiculo(String patente, Marca marca, String modelo, int anio, int kilometraje, EstadoVehiculo estadoVehiculo, BigDecimal precioPorDia) throws ObjetoNoExisteEx, AccesoDenegadoEx, SQLException {
 
-        if (!esAdministrador(usuario)) {
+        if (!esAdministrador(usuarioActual)) {
             throw new AccesoDenegadoEx("Acceso denegado.");
         }
 
@@ -133,13 +138,9 @@ public class Sistema {
         return "No se pudo agregar el vehículo.";
     }
 
-    public void darDeBajaVehiculo(Usuario usuario, int id) throws UsuarioNoEncontradoEx, AccesoDenegadoEx, SQLException {
+    public void darDeBajaVehiculo(int id) throws UsuarioNoEncontradoEx, AccesoDenegadoEx, SQLException {
 
-        if (!usuarioExiste(usuario)) {
-            throw new UsuarioNoEncontradoEx("El usuario ingreasado no existe.");
-        }
-
-        if (!esAdministrador(usuario)) {
+        if (!esAdministrador(usuarioActual)) {
             throw new AccesoDenegadoEx("Acceso denegado.");
         }
 
@@ -150,20 +151,24 @@ public class Sistema {
     }
 
     /// Gestión de reservas
-    public String agregarReserva(Usuario usuario) throws UsuarioNoEncontradoEx, AccesoDenegadoEx {
+    public String agregarReserva(int idCliente, int idVehiculo, LocalDateTime fechaReserva, LocalDate fechaInicio, LocalDate fechaFin, EstadoReserva estadoReserva) throws ObjetoNoExisteEx, AccesoDenegadoEx {
 
-        if (!usuarioExiste(usuario)) {
-            throw new UsuarioNoEncontradoEx("El usuario ingreasado no existe.");
+        if (!clientes.existe(idCliente)) {
+            throw new ObjetoNoExisteEx("El cliente ingresado no existe.");
         }
 
-        if (!esAdministrador(usuario) && !tienePermisos(usuario, TipoEmpleado.EMPLEADO_VENTAS)) {
+        if (!vehiculos.existe(idVehiculo)) {
+            throw new ObjetoNoExisteEx("El vehiculo ingresado no existe.");
+        }
+
+        if (!esAdministrador(usuarioActual) && !tienePermisos(usuarioActual, TipoEmpleado.EMPLEADO_VENTAS)) {
             throw new AccesoDenegadoEx("Acceso denegado.");
         }
 
-        int idGenerada = ReservaDAO.agregarReservaBDD();
+        int idGenerada = ReservaDAO.agregarReservaBDD(vehiculo, usuario, fechaReserva, fechaInicio, fechaFin, estadoReserva);
 
         if (idGenerada != -1) {
-            Reserva reserva = new Reserva();
+            Reserva reserva = new Reserva(idGenerada, cliente, vehiculo, usuario, fechaReserva, fechaInicio, fechaFin, estadoReserva);
             reservas.agregar(reserva);
             return "Se agregó correctamente la reserva.";
         }
@@ -171,13 +176,9 @@ public class Sistema {
     }
 
     /// Gestión de alquileres
-    public String agregarAlquiler(Usuario usuario)  throws UsuarioNoEncontradoEx, AccesoDenegadoEx {
+    public String agregarAlquiler()  throws UsuarioNoEncontradoEx, AccesoDenegadoEx {
 
-        if (!usuarioExiste(usuario)) {
-            throw new UsuarioNoEncontradoEx("El usuario ingreasado no existe.");
-        }
-
-        if (!esAdministrador(usuario) && !tienePermisos(usuario, TipoEmpleado.EMPLEADO_VENTAS)) {
+        if (!esAdministrador(usuarioActual) && !tienePermisos(usuarioActual, TipoEmpleado.EMPLEADO_VENTAS)) {
             throw new AccesoDenegadoEx("Acceso denegado.");
         }
 
