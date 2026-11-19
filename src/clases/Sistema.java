@@ -138,15 +138,30 @@ public class Sistema {
         return "No se pudo agregar el vehículo.";
     }
 
-    public void darDeBajaVehiculo(int id) throws AccesoDenegadoEx, SQLException {
+    public void darDeBajaVehiculo(int id) throws AccesoDenegadoEx, ObjetoNoExisteEx, VehiculoNoDisponibleEx, SQLException {
 
         if (!esAdministrador(usuarioActual)) {
             throw new AccesoDenegadoEx("Acceso denegado.");
         }
 
-        VehiculoDAO.actualizarEstadoVehiculoBDD(id, EstadoVehiculo.FUERA_DE_SERVICIO);
-
         Vehiculo vehiculo = vehiculos.buscar(id);
+
+        if (vehiculo == null) {
+            throw new ObjetoNoExisteEx("El vehículo no existe.");
+        }
+
+        if (vehiculo.getEstadoVehiculo() == EstadoVehiculo.RESERVADO || vehiculo.getEstadoVehiculo() == EstadoVehiculo.ALQUILADO) {
+            throw new VehiculoNoDisponibleEx("No se puede dar de baja un vehículo reservado o alquilado.");
+        }
+
+        if (vehiculo.getEstadoVehiculo() == EstadoVehiculo.FUERA_DE_SERVICIO) {
+            throw new IllegalArgumentException("El vehículo ya se encuentra fuera de servicio.");
+        }
+
+        if (!VehiculoDAO.actualizarEstadoVehiculoBDD(id, EstadoVehiculo.FUERA_DE_SERVICIO)) {
+            throw new SQLException("No se pudo dar de baja el vehículo.");
+        }
+
         vehiculo.setEstadoVehiculo(EstadoVehiculo.FUERA_DE_SERVICIO);
     }
 
