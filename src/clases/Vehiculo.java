@@ -95,18 +95,31 @@ public class Vehiculo implements IObtenerID {
     }
 
     //----------------------------------------------------------|Metodos|----------------------------------------------------------
+
+
+    @Override
+    public String toString() {
+        return "Vehiculo{" +
+                "id=" + id +
+                ", patente='" + patente + '\'' +
+                ", marca=" + marca +
+                ", modelo='" + modelo + '\'' +
+                ", anio=" + anio +
+                ", kilometraje=" + kilometraje +
+                ", estadoVehiculo=" + estadoVehiculo +
+                ", precioPorDia=" + precioPorDia +
+                '}';
+    }
+
     @Override
     public boolean equals(Object o) {
-        if(this == o)return true;
-
-        if (o == null || getClass() != o.getClass()) return false;
-        Vehiculo vehiculo = (Vehiculo) o;
-        return id == vehiculo.id && anio == vehiculo.anio && kilometraje == vehiculo.kilometraje && Objects.equals(patente, vehiculo.patente) && marca == vehiculo.marca && Objects.equals(modelo, vehiculo.modelo) && estadoVehiculo == vehiculo.estadoVehiculo && Objects.equals(precioPorDia, vehiculo.precioPorDia);
+        if (!(o instanceof Vehiculo vehiculo)) return false;
+        return id == vehiculo.id;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, patente, marca, modelo, anio, kilometraje, estadoVehiculo, precioPorDia);
+        return Objects.hashCode(id);
     }
 
     @Override

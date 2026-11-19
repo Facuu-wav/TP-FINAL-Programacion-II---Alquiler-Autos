@@ -14,6 +14,7 @@ import java.math.BigDecimal;
 import java.sql.*;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.LinkedHashSet;
 
 public class VehiculoDAO {
     //------------------------------------|Querys|------------------------------------
@@ -100,43 +101,37 @@ public class VehiculoDAO {
         }
     }
 
-    /// Revisar luego
     //||OBTENER_LISTA_DE_VEHICULOS||--> retorna una lista de los clientes existentes en la base de datos.
-    public static ArrayList<Vehiculo> listaVehiculosBDD() throws SQLException, NoExistenElementosCargadosEx, IdNoExistenteEx {
-        ArrayList<Vehiculo> vehiculos = new ArrayList<>();
+    public static LinkedHashSet<Vehiculo> listarVehiculosBDD() throws SQLException, NoExistenElementosCargadosEx {
 
-        try(Connection connection = DBHandler.getConnection();  PreparedStatement statement = connection.prepareStatement(LISTAR_VEHICULOS)) {
+        LinkedHashSet<Vehiculo> vehiculos = new LinkedHashSet<>();
 
-            try(ResultSet rs = statement.executeQuery()){
-                while (rs.next()) {
-                    int id = rs.getInt("id");
+        try (Connection conn = DBHandler.getConnection(); PreparedStatement ps = conn.prepareStatement(LISTAR_VEHICULOS); ResultSet rs = ps.executeQuery()) {
 
-                    String patente = rs.getString("patente");
+            while (rs.next()) {
 
-                    Marca marca = Marca.fromString
-                            (rs.getString("marca"));
+                int id = rs.getInt("id");
+                String patente = rs.getString("patente");
+                Marca marca = Marca.fromString(rs.getString("marca"));
+                String modelo = rs.getString("modelo");
+                int anio = rs.getInt("anio");
+                int kilometraje = rs.getInt("kilometraje");
 
-                    String modelo = rs.getString("modelo");
+                EstadoVehiculo estadoVehiculo = EstadoVehiculo.fromString(rs.getString("estadoVehiculo"));
 
-                    int anio = rs.getInt("anio");
+                BigDecimal precioPorDia = rs.getBigDecimal("precioPorDia");
 
-                    int kilometraje = rs.getInt("kilometraje");
+                Vehiculo vehiculo = new Vehiculo(id, patente, marca, modelo, anio, kilometraje, estadoVehiculo, precioPorDia);
 
-                    EstadoVehiculo estadoVehiculo = EstadoVehiculo.fromString
-                            (rs.getString("estado_vehiculo"));
-
-                    BigDecimal precioPorDia = rs.getBigDecimal("precio_por_dia");
-
-                    vehiculos.add( new Vehiculo(id, patente, marca, modelo, anio, kilometraje,  estadoVehiculo, precioPorDia));
-
-
-                }
-
-                if(vehiculos.isEmpty())throw new NoExistenElementosCargadosEx("ERROR: no hay datos cargados en el sistema.");
-
+                vehiculos.add(vehiculo);
             }
         }
 
+        if (vehiculos.isEmpty()) {
+            throw new NoExistenElementosCargadosEx(
+                    "No hay vehículos cargados en la base de datos."
+            );
+        }
         return vehiculos;
     }
 

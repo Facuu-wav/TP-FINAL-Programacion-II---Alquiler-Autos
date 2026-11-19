@@ -4,16 +4,14 @@ import clases.empleados.Administrador;
 import clases.empleados.Empleado;
 import clases.empleados.Usuario;
 import enums.*;
-import excepciones.AccesoDenegadoEx;
-import excepciones.ContraseniaIncorrectaEx;
-import excepciones.ObjetoNoExisteEx;
-import excepciones.VehiculoNoDisponibleEx;
+import excepciones.*;
 import sql.*;
 
 import java.math.BigDecimal;
 import java.sql.SQLException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.LinkedHashSet;
 
 public class Sistema {
 
@@ -170,6 +168,29 @@ public class Sistema {
         }
 
         vehiculo.setEstadoVehiculo(EstadoVehiculo.FUERA_DE_SERVICIO);
+    }
+
+    public void cargarVehiculosBDD() throws SQLException, NoExistenElementosCargadosEx {
+
+        LinkedHashSet<Vehiculo> vehiculosBDD = VehiculoDAO.listarVehiculosBDD();
+
+        for (Vehiculo vehiculo : vehiculosBDD) {
+            vehiculos.agregar(vehiculo);
+        }
+    }
+
+    public StringBuilder listarVehiculosActivos() {
+
+        StringBuilder sb = new StringBuilder();
+
+        for (Vehiculo vehiculo : vehiculos.obtenerTodos()) {
+
+            if (vehiculo.getEstadoVehiculo() != EstadoVehiculo.FUERA_DE_SERVICIO) {
+                sb.append(vehiculo).append("\n");
+            }
+        }
+
+        return sb;
     }
 
     /// Gestión de reservas
