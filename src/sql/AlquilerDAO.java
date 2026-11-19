@@ -98,7 +98,7 @@ public class AlquilerDAO {
 
                }
 
-
+               if(Alquileres.isEmpty())throw new ;
            }
        }
 
