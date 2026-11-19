@@ -8,7 +8,11 @@ import java.sql.*;
 public class BDHandler {
 
     /// WALLY CUANDO HAGAMOS LA BASE DE DATOS HAY QUE ACTUALIZAR ESTO!!!
-    private static final String url = "jdbc:sqlite:database.db";
+    private static final String URL = "jdbc:sqlite:database.db";
+
+    public static Connection getConnection() throws SQLException {
+        return DriverManager.getConnection(URL);
+    }
 
     // Consultas de usuarios
 
@@ -17,7 +21,7 @@ public class BDHandler {
 
         String sqlquery = "SELECT * FROM usuario WHERE nombreUsuario = ?";
 
-        try (Connection connection = DriverManager.getConnection(url)) {
+        try (Connection connection = DriverManager.getConnection(URL)) {
             try (PreparedStatement preparedStatement = connection.prepareStatement(sqlquery)) {
 
                 preparedStatement.setString(1, nombreUsuario);

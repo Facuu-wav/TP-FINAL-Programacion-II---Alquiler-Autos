@@ -15,7 +15,7 @@ public abstract class Usuario {
     private TipoUsuario tipoUsuario;
 
     // ----------------------------------------------------------|Constructor/es|----------------------------------------------------------
-    public Usuario(int id, String nombre, String apellido, String dni, String nombreUsuario, String email, String contrasenia) {
+    public Usuario(int id, String nombre, String apellido, String dni, String nombreUsuario, String email, String contrasenia, TipoUsuario tipoUsuario) {
         this.id = id;
         this.nombre = nombre;
         this.apellido = apellido;
@@ -23,6 +23,7 @@ public abstract class Usuario {
         this.nombreUsuario = nombreUsuario;
         this.email = email;
         this.contrasenia = contrasenia;
+        this.tipoUsuario = tipoUsuario;
     }
 
     //----------------------------------------------------------|Getters|----------------------------------------------------------
@@ -52,6 +53,10 @@ public abstract class Usuario {
 
     public String getContrasenia() {
         return contrasenia;
+    }
+
+    public TipoUsuario getTipoUsuario() {
+        return tipoUsuario;
     }
 
     //----------------------------------------------------------|Setters|----------------------------------------------------------
