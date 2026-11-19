@@ -84,7 +84,7 @@ public class Sistema {
 
         if (idGenerada != -1) {
             Vehiculo vehiculo = new Vehiculo(idGenerada, patente, marca, modelo, anio, kilometraje, estadoVehiculo, precioPorDia);
-            vehiculos.add(vehiculo);
+            vehiculos.agregar(vehiculo);
             return "Se agregó correctamente el vehículo.";
         }
         return "No se pudo agregar el vehículo";

@@ -39,6 +39,7 @@ public class VehiculoDAO {
         return idGenerada;
     }
 
+    /*
     public static boolean eliminarVehiculoBDD(int id) throws SQLException {
 
         boolean eliminado = false;
@@ -52,6 +53,11 @@ public class VehiculoDAO {
             }
         }
         return eliminado;
+    }
+    */
+
+    public static void cambiarEstadoVehiculo() {
+
     }
 
 }
