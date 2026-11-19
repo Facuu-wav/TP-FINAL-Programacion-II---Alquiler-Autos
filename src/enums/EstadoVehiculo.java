@@ -5,7 +5,8 @@ public enum EstadoVehiculo {
     RESERVADO,
     ALQUILADO,
     EN_MANTENIMIENTO,
-    EN_LIMPIEZA;
+    EN_LIMPIEZA,
+    FUERA_DE_SERVICIO;
 
     // metodo para pasar de string a enum. si recibe un string vacio o nulo entonces retora null
     public EstadoVehiculo fromString(String strestadovehiculo){

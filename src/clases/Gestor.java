@@ -1,20 +1,31 @@
 package clases;
 
-import java.util.ArrayList;
+import interfaces.IObtenerID;
 
-public class Gestor <T> {
+import java.util.Collection;
+
+public class Gestor <T extends IObtenerID> {
 
     /// Atributos
-    private ArrayList<T> lista;
+    private Collection<T> elementos;
 
     /// Constructor/es
-    public Gestor() {
-        this.lista = new ArrayList<>();
+    public Gestor(Collection<T> elementos) {
+        this.elementos = elementos;
     }
 
     /// Métodos
-    public void agregarElemento(T e) {
-        lista.add(e);
+    public void agregar(T e) {
+        elementos.add(e);
+    }
+
+    public T buscar(int id) {
+        for (T e : elementos) {
+            if (e.obtenerID() == id) {
+                return e;
+            }
+        }
+        return null;
     }
 
 

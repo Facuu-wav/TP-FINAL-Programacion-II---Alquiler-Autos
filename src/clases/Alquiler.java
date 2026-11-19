@@ -2,10 +2,11 @@ package clases;
 
 import clases.empleados.Usuario;
 import enums.EstadoAlquiler;
+import interfaces.IObtenerID;
 
 import java.time.LocalDateTime;
 
-public class Alquiler {
+public class Alquiler implements IObtenerID {
 
     /// Atributos
     private int id;
@@ -22,7 +23,16 @@ public class Alquiler {
 
     /// Constructor/es
 
+    /// Getters
+    public int getId() {
+        return id;
+    }
+
     /// Métodos
+    @Override
+    public int obtenerID() {
+        return getId();
+    }
 
 
 

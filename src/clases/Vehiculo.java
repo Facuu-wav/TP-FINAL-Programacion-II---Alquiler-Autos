@@ -2,11 +2,12 @@ package clases;
 
 import enums.EstadoVehiculo;
 import enums.Marca;
+import interfaces.IObtenerID;
 
 import java.math.BigDecimal;
 import java.util.Objects;
 
-public class Vehiculo {
+public class Vehiculo implements IObtenerID {
 
     /// ----------------------------------------------------------|Atributos|----------------------------------------------------------
     private final int id;
@@ -106,5 +107,10 @@ public class Vehiculo {
     @Override
     public int hashCode() {
         return Objects.hash(id, patente, marca, modelo, anio, kilometraje, estadoVehiculo, precioPorDia);
+    }
+
+    @Override
+    public int obtenerID() {
+        return getId();
     }
 }

@@ -12,6 +12,7 @@ import sql.VehiculoDAO;
 
 import java.math.BigDecimal;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.HashSet;
 
 public class Sistema {
@@ -19,13 +20,13 @@ public class Sistema {
     /// Atributos
     private Gestor<Reserva> reservas;
     private Gestor<Alquiler> alquileres;
-    private HashSet<Vehiculo> vehiculos;
+    private Gestor<Vehiculo> vehiculos;
 
     /// Constructor/es
     public Sistema() {
-        this.reservas = new Gestor<>();
-        this.alquileres = new Gestor<>();
-        this.vehiculos = new HashSet<>();
+        this.reservas = new Gestor<>(new ArrayList<>());
+        this.alquileres = new Gestor<>(new ArrayList<>());
+        this.vehiculos = new Gestor<>(new HashSet<>());
     }
 
     /// Métodos
@@ -68,7 +69,7 @@ public class Sistema {
         return false;
     }
 
-    // Gestión de vehículos
+    /// Gestión de vehículos
     public String agregarVehiculo(Usuario usuario, String patente, Marca marca, String modelo, int anio, int kilometraje, EstadoVehiculo estadoVehiculo, BigDecimal precioPorDia) throws AccesoDenegadoEx, SQLException {
 
         /// REVISAR ESTO
@@ -87,6 +88,18 @@ public class Sistema {
             return "Se agregó correctamente el vehículo.";
         }
         return "No se pudo agregar el vehículo";
+    }
+
+    public void darDeBajaVehiculo(Usuario usuario, int id) throws AccesoDenegadoEx, SQLException {
+
+        // validación de usuario acá
+
+        // VehiculoDAO acá
+
+        Vehiculo vehiculo = vehiculos.buscar(id);
+        vehiculo.setEstadoVehiculo(EstadoVehiculo.FUERA_DE_SERVICIO);
+
+
     }
 
     // Gestión de reservas
