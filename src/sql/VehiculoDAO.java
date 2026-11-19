@@ -21,15 +21,14 @@ public class VehiculoDAO {
     private static final String INSERT_VEHICULO =
             "INSERT INTO vehiculo (patente, marca, modelo, anio, kilometraje, estado_vehiculo, precio_por_dia) VALUES (?, ?, ?, ?, ?, ?, ?)";
 
-    private static final String DELETE_VEHICULO =
-            "DELETE FROM vehiculo WHERE id = ?";
-
     private static final String LISTAR_VEHICULOS =
             "SELECT * FROM vehiculo";
 
-
     private static final String VEHICULO_POR_ID =
             "SELECT * FROM reserva WHERE id = ?";
+
+    private static final String UPDATE_VEHICULO =
+            "UPDATE vehiculo SET estado_vehiculo = ? WHERE id = ?";
 
     //------------------------------------|Metodos|------------------------------------
 
@@ -73,7 +72,6 @@ public class VehiculoDAO {
         return vehiculo;
     }
 
-
     //||AGREGAR_VEHICULO||--> Retorna el id generado del objeto agregado a la base de datos.
     public static int agregarVehiculoBDD(String patente, Marca marca, String modelo, int anio, int kilometraje, EstadoVehiculo estadoVehiculo, BigDecimal precioPorDia) throws SQLException {
 
@@ -101,7 +99,6 @@ public class VehiculoDAO {
     }
 
     //||OBTENER_LISTA_DE_VEHICULOS||--> retorna una lista de los clientes existentes en la base de datos.
-
     public static ArrayList<Vehiculo> listaVehiculosBDD() throws SQLException, NoExistenElementosCargadosEx, IdNoExistenteEx {
         ArrayList<Vehiculo> vehiculos = new ArrayList<>();
 
@@ -140,27 +137,16 @@ public class VehiculoDAO {
         return vehiculos;
     }
 
-    /*
-    public static boolean eliminarVehiculoBDD(int id) throws SQLException {
+    public static boolean actualizarEstadoVehiculoBDD(int idVehiculo, EstadoVehiculo estadoVehiculo) throws SQLException {
 
-        boolean eliminado = false;
+        try (Connection conn = DBHandler.getConnection(); PreparedStatement ps = conn.prepareStatement(UPDATE_VEHICULO)) {
 
-        try (Connection conn = DBHandler.getConnection(); PreparedStatement ps = conn.prepareStatement(DELETE_VEHICULO)) {
-            ps.setInt(1, id);
-            int filasAfectadas = ps.executeUpdate();
+            ps.setString(1, estadoVehiculo.name());
+            ps.setInt(2, idVehiculo);
 
-            if (filasAfectadas == 1) {
-                eliminado = true;
-            }
+            return ps.executeUpdate() == 1;
         }
-        return eliminado;
     }
-    */
-
-    public static void cambiarEstadoVehiculoBDD() {
-
-    }
-
 
 
 }

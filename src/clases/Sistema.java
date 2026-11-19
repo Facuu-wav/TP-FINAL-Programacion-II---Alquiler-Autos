@@ -7,7 +7,7 @@ import enums.*;
 import excepciones.AccesoDenegadoEx;
 import excepciones.ContraseniaIncorrectaEx;
 import excepciones.ObjetoNoExisteEx;
-import excepciones.UsuarioNoEncontradoEx;
+import excepciones.VehiculoNoDisponibleEx;
 import sql.*;
 
 import java.math.BigDecimal;
@@ -88,7 +88,7 @@ public class Sistema {
         return "No se pudo agregar el administrador.";
     }
 
-    public String agregarEmpleado(String nombre, String apellido, String dni, String nombreUsuario, String email, String contrasenia, TipoEmpleado tipoEmpleado, int legajo, BigDecimal pagoPorHora, int horasTrabajadas) throws UsuarioNoEncontradoEx, AccesoDenegadoEx {
+    public String agregarEmpleado(String nombre, String apellido, String dni, String nombreUsuario, String email, String contrasenia, TipoEmpleado tipoEmpleado, int legajo, BigDecimal pagoPorHora, int horasTrabajadas) throws AccesoDenegadoEx {
 
         if (!esAdministrador(usuarioActual)) {
             throw new AccesoDenegadoEx("Acceso denegado.");
@@ -105,7 +105,7 @@ public class Sistema {
     }
 
     /// Gestión de clientes
-    public String agregarCliente() throws UsuarioNoEncontradoEx, AccesoDenegadoEx {
+    public String agregarCliente() throws AccesoDenegadoEx {
 
         if (!esAdministrador(usuarioActual)) {
             throw new AccesoDenegadoEx("Acceso denegado.");
@@ -138,45 +138,70 @@ public class Sistema {
         return "No se pudo agregar el vehículo.";
     }
 
-    public void darDeBajaVehiculo(int id) throws UsuarioNoEncontradoEx, AccesoDenegadoEx, SQLException {
+    public void darDeBajaVehiculo(int id) throws AccesoDenegadoEx, SQLException {
 
         if (!esAdministrador(usuarioActual)) {
             throw new AccesoDenegadoEx("Acceso denegado.");
         }
 
-        // VehiculoDAO acá
+        VehiculoDAO.actualizarEstadoVehiculoBDD(id, EstadoVehiculo.FUERA_DE_SERVICIO);
 
         Vehiculo vehiculo = vehiculos.buscar(id);
         vehiculo.setEstadoVehiculo(EstadoVehiculo.FUERA_DE_SERVICIO);
     }
 
     /// Gestión de reservas
-    public String agregarReserva(int idCliente, int idVehiculo, LocalDateTime fechaReserva, LocalDate fechaInicio, LocalDate fechaFin, EstadoReserva estadoReserva) throws ObjetoNoExisteEx, AccesoDenegadoEx {
-
-        if (!clientes.existe(idCliente)) {
-            throw new ObjetoNoExisteEx("El cliente ingresado no existe.");
-        }
-
-        if (!vehiculos.existe(idVehiculo)) {
-            throw new ObjetoNoExisteEx("El vehiculo ingresado no existe.");
-        }
+    public String agregarReserva(int idCliente, int idVehiculo, LocalDateTime fechaReserva, LocalDate fechaInicio, LocalDate fechaFin) throws AccesoDenegadoEx, ObjetoNoExisteEx, VehiculoNoDisponibleEx, SQLException {
 
         if (!esAdministrador(usuarioActual) && !tienePermisos(usuarioActual, TipoEmpleado.EMPLEADO_VENTAS)) {
             throw new AccesoDenegadoEx("Acceso denegado.");
         }
 
-        int idGenerada = ReservaDAO.agregarReservaBDD(vehiculo, usuario, fechaReserva, fechaInicio, fechaFin, estadoReserva);
+        Cliente cliente = clientes.buscar(idCliente);
 
-        if (idGenerada != -1) {
-            Reserva reserva = new Reserva(idGenerada, cliente, vehiculo, usuario, fechaReserva, fechaInicio, fechaFin, estadoReserva);
-            reservas.agregar(reserva);
-            return "Se agregó correctamente la reserva.";
+        if (cliente == null) {
+            throw new ObjetoNoExisteEx("El cliente ingresado no existe.");
         }
-        return "No se pudo agregar la reserva";
+
+        Vehiculo vehiculo = vehiculos.buscar(idVehiculo);
+
+        if (vehiculo == null) {
+            throw new ObjetoNoExisteEx("El vehículo ingresado no existe.");
+        }
+
+        if (vehiculo.getEstadoVehiculo() != EstadoVehiculo.DISPONIBLE) {
+            throw new VehiculoNoDisponibleEx("El vehículo no está disponible.");
+        }
+
+        if (fechaReserva == null || fechaInicio == null || fechaFin == null || !fechaInicio.isBefore(fechaFin) || fechaReserva.toLocalDate().isAfter(fechaInicio)) {
+            throw new IllegalArgumentException("Las fechas de la reserva no son válidas.");
+        }
+
+        Usuario usuario = usuarioActual;
+        int idUsuario = usuario.obtenerID();
+
+        EstadoReserva estadoReserva = EstadoReserva.CONFIRMADA;
+
+        int idGenerada = ReservaDAO.agregarReservaBDD(idCliente, idVehiculo, idUsuario, fechaReserva, fechaInicio, fechaFin, estadoReserva);
+
+        if (idGenerada == -1) {
+            return "No se pudo agregar la reserva.";
+        }
+
+        if (!VehiculoDAO.actualizarEstadoVehiculoBDD(idVehiculo, EstadoVehiculo.RESERVADO)) {
+            throw new SQLException("No se pudo actualizar el estado del vehículo.");
+        }
+
+        Reserva reserva = new Reserva(idGenerada, cliente, vehiculo, usuario, fechaReserva, fechaInicio, fechaFin, estadoReserva);
+
+        reservas.agregar(reserva);
+        vehiculo.setEstadoVehiculo(EstadoVehiculo.RESERVADO);
+
+        return "Se agregó correctamente la reserva.";
     }
 
     /// Gestión de alquileres
-    public String agregarAlquiler()  throws UsuarioNoEncontradoEx, AccesoDenegadoEx {
+    public String agregarAlquiler()  throws AccesoDenegadoEx {
 
         if (!esAdministrador(usuarioActual) && !tienePermisos(usuarioActual, TipoEmpleado.EMPLEADO_VENTAS)) {
             throw new AccesoDenegadoEx("Acceso denegado.");
