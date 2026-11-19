@@ -21,7 +21,18 @@ public class Alquiler implements IObtenerID {
 
     private EstadoAlquiler estadoAlquiler;
 
-    /// Constructor/ezz
+    /// Constructor/es
+    ///
+    public Alquiler(int id, Reserva reserva, Usuario usuario, LocalDateTime fechaEntrega, LocalDateTime fechaDevolucion, int kilometrajeInicial, int kilometrajeFinal, EstadoAlquiler estadoAlquiler) {
+        this.id = id;
+        this.reserva = reserva;
+        this.usuario = usuario;
+        this.fechaEntrega = fechaEntrega;
+        this.fechaDevolucion = fechaDevolucion;
+        this.kilometrajeInicial = kilometrajeInicial;
+        this.kilometrajeFinal = kilometrajeFinal;
+        this.estadoAlquiler = estadoAlquiler;
+    }
 
     /// Getters
     public int getId() {

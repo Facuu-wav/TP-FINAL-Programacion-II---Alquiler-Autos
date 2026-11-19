@@ -15,7 +15,7 @@ public class ReservaDAO {
 
     private static final String RESERVA_POR_ID = "SELECT * FROM reserva WHERE id = ?";
 
-    //--> Metodo para buscar RESERVA_POR_ID RETORNANDO EL OBJETO ENCONTRADO.
+    //||OBTENER_RESERVA_POR_ID||--> Metodo para buscar RESERVA_POR_ID RETORNANDO EL OBJETO ENCONTRADO.
     public static Reserva reservaPorId(int idbuscado) throws SQLException, IdNoExistenteEx{
         Reserva reserva = null;
 

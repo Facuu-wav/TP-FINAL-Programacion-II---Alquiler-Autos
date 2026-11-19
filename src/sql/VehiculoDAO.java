@@ -19,7 +19,48 @@ public class VehiculoDAO {
     private static final String VEHICULO_POR_ID =
             "SELECT * FROM reserva WHERE id = ?";
 
+    //||OBTENER_VEHICULO_POR_ID||--> Metodo para buscar VEHICULO_POR_ID y retornarlo como objeto..
+    public static Vehiculo vehiculoPorId(int idbuscado) throws SQLException, IdNoExistenteEx {
+        Vehiculo vehiculo = null;
 
+        try(Connection connection = DBHandler.getConnection()){
+            PreparedStatement ps = connection.prepareStatement(VEHICULO_POR_ID);
+
+            ps.setInt(1, idbuscado);
+
+            try(ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    int id = rs.getInt("id");
+
+                    String patente = rs.getString("patente");
+
+                    Marca marca = Marca.fromString
+                            (rs.getString("marca"));
+
+                    String modelo = rs.getString("modelo");
+
+                    int anio = rs.getInt("anio");
+
+                    int kilometraje = rs.getInt("kilometraje");
+
+                    EstadoVehiculo estadoVehiculo = EstadoVehiculo.fromString
+                            (rs.getString("estado_vehiculo"));
+
+                    BigDecimal precioPorDia = rs.getBigDecimal("precio_por_dia");
+
+                    vehiculo = new Vehiculo(id, patente, marca, modelo, anio, kilometraje,  estadoVehiculo, precioPorDia);
+                }
+
+                if (!rs.next()) {
+                    throw new IdNoExistenteEx("ERROR: Ingresar un id existente.");
+                }
+            }
+        }
+        return vehiculo;
+    }
+
+
+    //||AGREGAR_VEHICULO||--> Retorna el id generado del objeto agregado a la base de datos.
     public static int agregarVehiculoBDD(String patente, Marca marca, String modelo, int anio, int kilometraje, EstadoVehiculo estadoVehiculo, BigDecimal precioPorDia) throws SQLException {
 
         int idGenerada = -1;
@@ -66,44 +107,6 @@ public class VehiculoDAO {
 
     }
 
-    //--> Metodo para buscar RESERVA_POR_ID RETORNANDO EL OBJETO ENCONTRADO.
-    public static Vehiculo vehiculoPorId(int idbuscado) throws SQLException, IdNoExistenteEx {
-        Vehiculo vehiculo = null;
 
-        try(Connection connection = DBHandler.getConnection()){
-            PreparedStatement ps = connection.prepareStatement(VEHICULO_POR_ID);
-
-            ps.setInt(1, idbuscado);
-
-            try(ResultSet rs = ps.executeQuery()) {
-                if (rs.next()) {
-                    int id = rs.getInt("id");
-
-                    String patente = rs.getString("patente");
-
-                    Marca marca = Marca.fromString
-                            (rs.getString("marca"));
-
-                    String modelo = rs.getString("modelo");
-
-                    int anio = rs.getInt("anio");
-
-                    int kilometraje = rs.getInt("kilometraje");
-
-                    EstadoVehiculo estadoVehiculo = EstadoVehiculo.fromString
-                            (rs.getString("estado_vehiculo"));
-
-                    BigDecimal precioPorDia = rs.getBigDecimal("precio_por_dia");
-
-                    vehiculo = new Vehiculo(id, patente, marca, modelo, anio, kilometraje,  estadoVehiculo, precioPorDia);
-                }
-
-                if (!rs.next()) {
-                    throw new IdNoExistenteEx("ERROR: Ingresar un id existente.");
-                }
-            }
-        }
-        return vehiculo;
-    }
 
 }
