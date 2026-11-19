@@ -122,20 +122,32 @@ public class Sistema {
     }
 
     /// Gestión de vehículos
-    public String agregarVehiculo(String patente, Marca marca, String modelo, int anio, int kilometraje, EstadoVehiculo estadoVehiculo, BigDecimal precioPorDia) throws ObjetoNoExisteEx, AccesoDenegadoEx, SQLException {
+    public String agregarVehiculo(String patente, Marca marca, String modelo, int anio, int kilometraje, BigDecimal precioPorDia) throws AccesoDenegadoEx, SQLException {
 
         if (!esAdministrador(usuarioActual)) {
             throw new AccesoDenegadoEx("Acceso denegado.");
         }
 
+        if (patente == null || patente.isBlank() || marca == null || modelo == null || modelo.isBlank() || anio <= 0 || kilometraje < 0 || precioPorDia == null || precioPorDia.compareTo(BigDecimal.ZERO) <= 0) {
+            throw new IllegalArgumentException("Los datos del vehículo no son válidos.");
+        }
+
+        if (VehiculoDAO.existePatenteBDD(patente)) {
+            throw new IllegalArgumentException("La patente ya está registrada");
+        }
+
+        EstadoVehiculo estadoVehiculo = EstadoVehiculo.DISPONIBLE;
         int idGenerada = VehiculoDAO.agregarVehiculoBDD(patente, marca, modelo, anio, kilometraje, estadoVehiculo, precioPorDia);
 
-        if (idGenerada != -1) {
-            Vehiculo vehiculo = new Vehiculo(idGenerada, patente, marca, modelo, anio, kilometraje, estadoVehiculo, precioPorDia);
-            vehiculos.agregar(vehiculo);
-            return "Se agregó correctamente el vehículo.";
+        if (idGenerada == -1) {
+            return "No se pudo agregar el vehículo.";
         }
-        return "No se pudo agregar el vehículo.";
+
+        Vehiculo vehiculo = new Vehiculo(idGenerada, patente, marca, modelo, anio, kilometraje, estadoVehiculo, precioPorDia);
+
+        vehiculos.agregar(vehiculo);
+
+        return "Se agregó correctamente el vehículo.";
     }
 
     public void darDeBajaVehiculo(int id) throws AccesoDenegadoEx, ObjetoNoExisteEx, VehiculoNoDisponibleEx, SQLException {

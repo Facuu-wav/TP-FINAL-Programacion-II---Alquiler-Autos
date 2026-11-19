@@ -30,6 +30,9 @@ public class VehiculoDAO {
     private static final String UPDATE_VEHICULO =
             "UPDATE vehiculo SET estado_vehiculo = ? WHERE id = ?";
 
+    private static final String PATENTE_EXISTE =
+            "SELECT 1 FROM vehiculo WHERE patente = ? LIMIT 1";
+
     //------------------------------------|Metodos|------------------------------------
 
     //||OBTENER_VEHICULO_POR_ID||--> Metodo para buscar VEHICULO_POR_ID y retornarlo como objeto..
@@ -145,6 +148,18 @@ public class VehiculoDAO {
             ps.setInt(2, idVehiculo);
 
             return ps.executeUpdate() == 1;
+        }
+    }
+
+    public static boolean existePatenteBDD(String patente) throws SQLException {
+
+        try (Connection conn = DBHandler.getConnection(); PreparedStatement ps = conn.prepareStatement(PATENTE_EXISTE)) {
+
+            ps.setString(1, patente);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                return rs.next();
+            }
         }
     }
 
