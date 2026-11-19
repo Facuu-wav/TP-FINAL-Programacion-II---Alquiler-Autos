@@ -36,7 +36,7 @@ public class Sistema {
 
     /// Métodos
 
-    // Gestión de usuarios del sistema
+    /// Gestión de usuarios del sistema
     public Usuario iniciarSesion(String nombreUsuario, String contrasenia) throws SQLException, UsuarioNoEncontradoEx, ContraseniaIncorrectaEx {
 
         Usuario usuario = DBHandler.buscarUsuario(nombreUsuario);
@@ -87,24 +87,16 @@ public class Sistema {
 
     }
 
-    /// corregir
-    /*
-    private boolean tienePermiso(Usuario usuario, TipoEmpleado... tipos) {
-        for (TipoEmpleado tipo : tipos) {
-            if (usuario.getTipoUsuario() == tipo) {
-                return true;
-            }
-        }
-        return false;
+    private boolean usuarioExiste(Usuario usuario) {
+        return usuario != null;
     }
-    */
 
     private boolean esAdministrador(Usuario usuario) {
         return usuario instanceof Administrador;
     }
 
-    private boolean puedeGestionar(Usuario usuario) {
-        return usuario instanceof Empleado empleado && empleado.getTipoEmpleado() == TipoEmpleado.EMPLEADO_VENTAS;
+    private boolean tienePermisos(Usuario usuario, TipoEmpleado tipoEmpleado) {
+        return usuario instanceof Empleado empleado && empleado.getTipoEmpleado() == tipoEmpleado;
     }
 
     /// Gestión de clientes
@@ -141,22 +133,30 @@ public class Sistema {
         return "No se pudo agregar el vehículo.";
     }
 
-    public void darDeBajaVehiculo(Usuario usuario, int id) throws AccesoDenegadoEx, SQLException {
+    public void darDeBajaVehiculo(Usuario usuario, int id) throws UsuarioNoEncontradoEx, AccesoDenegadoEx, SQLException {
 
-        // validación de usuario acá
+        if (!usuarioExiste(usuario)) {
+            throw new UsuarioNoEncontradoEx("El usuario ingreasado no existe.");
+        }
+
+        if (!esAdministrador(usuario)) {
+            throw new AccesoDenegadoEx("Acceso denegado.");
+        }
 
         // VehiculoDAO acá
 
         Vehiculo vehiculo = vehiculos.buscar(id);
         vehiculo.setEstadoVehiculo(EstadoVehiculo.FUERA_DE_SERVICIO);
-
-
     }
 
     /// Gestión de reservas
-    public String agregarReserva(Usuario usuario) throws AccesoDenegadoEx {
+    public String agregarReserva(Usuario usuario) throws UsuarioNoEncontradoEx, AccesoDenegadoEx {
 
-        if (!esAdministrador(usuario) && !(puedeGestionar(usuario))) {
+        if (!usuarioExiste(usuario)) {
+            throw new UsuarioNoEncontradoEx("El usuario ingreasado no existe.");
+        }
+
+        if (!esAdministrador(usuario) && !tienePermisos(usuario, TipoEmpleado.EMPLEADO_VENTAS)) {
             throw new AccesoDenegadoEx("Acceso denegado.");
         }
 
@@ -171,9 +171,15 @@ public class Sistema {
     }
 
     /// Gestión de alquileres
-    public String agregarAlquiler()  throws AccesoDenegadoEx {
+    public String agregarAlquiler(Usuario usuario)  throws UsuarioNoEncontradoEx, AccesoDenegadoEx {
 
-        // validaciones y excepciones acá
+        if (!usuarioExiste(usuario)) {
+            throw new UsuarioNoEncontradoEx("El usuario ingreasado no existe.");
+        }
+
+        if (!esAdministrador(usuario) && !tienePermisos(usuario, TipoEmpleado.EMPLEADO_VENTAS)) {
+            throw new AccesoDenegadoEx("Acceso denegado.");
+        }
 
         int idGenerada = AlquilerDAO.agregarAlquilerBDD();
 
