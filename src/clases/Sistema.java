@@ -15,7 +15,6 @@ import java.sql.SQLException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
-
 public class Sistema {
 
     /// Atributos
@@ -44,7 +43,7 @@ public class Sistema {
 
         Usuario usuario = UsuarioDAO.buscarUsuario(nombreUsuario);
 
-        if (!usuarioExiste(usuario)) {
+        if (usuario == null) {
             throw new ObjetoNoExisteEx("El usuario no existe.");
         }
 
@@ -60,10 +59,6 @@ public class Sistema {
         this.usuarioActual = null;
     }
 
-    private boolean usuarioExiste(Usuario usuario) {
-        return usuario != null;
-    }
-
     private boolean esAdministrador(Usuario usuario) {
         return usuario instanceof Administrador;
     }
@@ -72,7 +67,7 @@ public class Sistema {
         return usuario instanceof Empleado empleado && empleado.getTipoEmpleado() == tipoEmpleado;
     }
 
-    public String agregarAdministrador(String nombre, String apellido, String dni, String nombreUsuario, String email, String contrasenia) throws AccesoDenegadoEx {
+    public String agregarAdministrador(String nombre, String apellido, String dni, String nombreUsuario, String email, String contrasenia) throws AccesoDenegadoEx, SQLException {
 
         if (!esAdministrador(usuarioActual)) {
             throw new AccesoDenegadoEx("Acceso denegado.");
@@ -80,15 +75,14 @@ public class Sistema {
 
         int idGenerada = UsuarioDAO.agregarAdministradorBDD(nombre, apellido, dni, nombreUsuario, email, contrasenia);
 
-        if (idGenerada != -1) {
-            Administrador administrador = new Administrador(idGenerada, nombre, apellido, dni, nombreUsuario, email, contrasenia);
-            usuarios.agregar(administrador);
-            return "Se agregó correctamente el administrador.";
-        }
-        return "No se pudo agregar el administrador.";
+        Administrador administrador = new Administrador(idGenerada, nombre, apellido, dni, nombreUsuario, email, contrasenia);
+
+        usuarios.agregar(administrador);
+
+        return "Se agregó correctamente el administrador.";
     }
 
-    public String agregarEmpleado(String nombre, String apellido, String dni, String nombreUsuario, String email, String contrasenia, TipoEmpleado tipoEmpleado, int legajo, BigDecimal pagoPorHora, int horasTrabajadas) throws AccesoDenegadoEx {
+    public String agregarEmpleado(String nombre, String apellido, String dni, String nombreUsuario, String email, String contrasenia, TipoEmpleado tipoEmpleado, int legajo, BigDecimal pagoPorHora, int horasTrabajadas) throws AccesoDenegadoEx, SQLException {
 
         if (!esAdministrador(usuarioActual)) {
             throw new AccesoDenegadoEx("Acceso denegado.");
@@ -96,15 +90,15 @@ public class Sistema {
 
         int idGenerada = UsuarioDAO.agregarEmpleadoBDD(nombre, apellido, dni, nombreUsuario, email, contrasenia, tipoEmpleado, legajo, pagoPorHora, horasTrabajadas);
 
-        if (idGenerada != -1) {
-            Empleado empleado = new Empleado(idGenerada, nombre, apellido, dni, nombreUsuario, email, contrasenia, tipoEmpleado, legajo, pagoPorHora, horasTrabajadas);
-            usuarios.agregar(empleado);
-            return "Se agregó correctamente el empleado.";
-        }
-        return "No se pudo agregar el empleado";
+        Empleado empleado = new Empleado(idGenerada, nombre, apellido, dni, nombreUsuario, email, contrasenia, tipoEmpleado, legajo, pagoPorHora, horasTrabajadas);
+
+        usuarios.agregar(empleado);
+
+        return "Se agregó correctamente el empleado.";
     }
 
     /// Gestión de clientes
+    /*
     public String agregarCliente() throws AccesoDenegadoEx {
 
         if (!esAdministrador(usuarioActual)) {
@@ -120,6 +114,7 @@ public class Sistema {
         }
         return "No se pudo agregar el cliente.";
     }
+     */
 
     /// Gestión de vehículos
     public String agregarVehiculo(String patente, Marca marca, String modelo, int anio, int kilometraje, BigDecimal precioPorDia) throws AccesoDenegadoEx, SQLException {
@@ -228,6 +223,7 @@ public class Sistema {
     }
 
     /// Gestión de alquileres
+    /*
     public String agregarAlquiler()  throws AccesoDenegadoEx {
 
         if (!esAdministrador(usuarioActual) && !tienePermisos(usuarioActual, TipoEmpleado.EMPLEADO_VENTAS)) {
@@ -243,5 +239,6 @@ public class Sistema {
         }
         return "No se pudo agregar el alquiler";
     }
+     */
 
 }

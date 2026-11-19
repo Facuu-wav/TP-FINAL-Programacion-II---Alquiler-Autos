@@ -2,6 +2,8 @@ package clases.empleados;
 
 import interfaces.IObtenerID;
 
+import java.util.Objects;
+
 public abstract class Usuario implements IObtenerID {
 
     // ----------------------------------------------------------|Atributos|----------------------------------------------------------
@@ -82,6 +84,30 @@ public abstract class Usuario implements IObtenerID {
 
 
     //----------------------------------------------------------|Métodos|----------------------------------------------------------
+
+    @Override
+    public String toString() {
+        return "Usuario{" +
+                "id=" + id +
+                ", nombre='" + nombre + '\'' +
+                ", apellido='" + apellido + '\'' +
+                ", dni='" + dni + '\'' +
+                ", nombreUsuario='" + nombreUsuario + '\'' +
+                ", email='" + email + '\'' +
+                ", contrasenia='" + contrasenia + '\'' +
+                '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (!(o instanceof Usuario usuario)) return false;
+        return id == usuario.id;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(id);
+    }
 
     @Override
     public int obtenerID() {

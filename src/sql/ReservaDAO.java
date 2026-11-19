@@ -60,7 +60,8 @@ public class ReservaDAO {
         return idGenerada;
     }
 
-
+    /// mirar
+    /*
     //||OBTENER_RESERVA_POR_ID||--> Metodo para buscar RESERVA_POR_ID RETORNANDO EL OBJETO ENCONTRADO.
     public static Reserva reservaPorIdBDD(int idbuscado) throws SQLException, IdNoExistenteEx{
         Reserva reserva = null;
@@ -104,6 +105,8 @@ public class ReservaDAO {
     }
 
 
+
+
     //||OBTENER_LISTA_DE_RESERVAS||--> retorna una lista de las reservas existentes en la base de datos.
 
     public static ArrayList<Reserva> listaReservasBDD() throws SQLException, NoExistenElementosCargadosEx, IdNoExistenteEx {
@@ -143,6 +146,8 @@ public class ReservaDAO {
 
         return reservas;
     }
+
+     */
 
 
 }

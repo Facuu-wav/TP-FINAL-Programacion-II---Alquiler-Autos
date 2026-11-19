@@ -37,4 +37,13 @@ public class Empleado extends Usuario {
     //----------------------------------------------------------|Métodos|----------------------------------------------------------
 
 
+    @Override
+    public String toString() {
+        return super.toString() + "Empleado{" +
+                "tipoEmpleado=" + tipoEmpleado +
+                ", legajo=" + legajo +
+                ", pagoPorHora=" + pagoPorHora +
+                ", horasTrabajadas=" + horasTrabajadas +
+                '}';
+    }
 }

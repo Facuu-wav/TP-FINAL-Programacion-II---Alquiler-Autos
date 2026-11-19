@@ -2,6 +2,7 @@ package sql;
 
 import clases.empleados.Usuario;
 import clases.empleados.*;
+import enums.TipoEmpleado;
 import excepciones.IdNoExistenteEx;
 
 import java.math.BigDecimal;
@@ -13,15 +14,36 @@ public class UsuarioDAO {
 
     private static final String USUARIO_POR_ID = "SELECT * FROM usuario WHERE id = ?";
 
-    private static final String INSERT_USUARIO = //INCOMPLETA.
-            "INSERT INTO usuario (nombre, apellido, dni, nombreUsuario, email, contrasenia, tipoUsuario, legajo, pagoPorHora,HorasTrabajadas) VALUES (?, ?, ?, ?, ?, ?)";
-    //IMPORTANTE, HAY INCONCISTENCIAS CON LA BASE DE DATOS. LOS ELEMENTOS DE USUARIO NO USAN EL TIPADO STANDARD, estan escritosAsi;
+    private static final String INSERT_USUARIO =
+            "INSERT INTO usuario (nombre, apellido, dni, nombreUsuario, email, contrasenia, tipoUsuario) VALUES (?, ?, ?, ?, ?, ?, ?)";
+
+    private static final String INSERT_EMPLEADO =
+            "INSERT INTO empleado (idUsuario, tipoEmpleado, legajo, pagoPorHora, horasTrabajadas) VALUES (?, ?, ?, ?, ?)";
 
     private static final String BUSCAR_USUARIO_NOMBRE =
-            "SELECT * FROM usuario WHERE nombreUsuario = ?";
+            """
+            SELECT
+                u.id,
+                u.nombre,
+                u.apellido,
+                u.dni,
+                u.nombreUsuario,
+                u.email,
+                u.contrasenia,
+                u.tipoUsuario,
+                e.tipoEmpleado,
+                e.legajo,
+                e.pagoPorHora,
+                e.horasTrabajadas
+            FROM usuario u
+            LEFT JOIN empleado e ON u.id = e.idUsuario
+            WHERE u.nombreUsuario = ?
+            """;
 
     //------------------------------------|Metodos|------------------------------------
-    
+
+
+    /*
     //||OBTENER_USUARIO_ID||--> Metodo para buscar USUARIO_POR_ID retornando el objeto encontrado. //PENTDIENTE A REFACTORIZAR
     public static Usuario usuarioPorIdBDD(int idbuscado) throws SQLException, IdNoExistenteEx {
         Usuario usuario = null;
@@ -89,32 +111,102 @@ public class UsuarioDAO {
             return usuario;
         }
     }
+     */
 
-    //||AGREGAR_USUARIO||--> Retorna el id generado del objeto agregado a la base de datos.
-    public static int agregarUsuarioBDD(String nombre, String apellido, String dni, String nombreUsuario, String email, String contrasenia) throws SQLException {
+    private static int insertarUsuario(Connection conn, String nombre, String apellido, String dni, String nombreUsuario, String email, String contrasenia, String tipoUsuario) throws SQLException {
 
-        int idGenerada = -1;
-
-        try (Connection conn = DBHandler.getConnection(); PreparedStatement ps = conn.prepareStatement(INSERT_USUARIO, Statement.RETURN_GENERATED_KEYS)) {
+        try (PreparedStatement ps = conn.prepareStatement(INSERT_USUARIO)) {
 
             ps.setString(1, nombre);
-            ps.setString(1, apellido);
-            ps.setString(1, dni);
-            ps.setString(1, nombreUsuario);
-            ps.setString(1, email);
-            ps.setString(1, contrasenia);
+            ps.setString(2, apellido);
+            ps.setString(3, dni);
+            ps.setString(4, nombreUsuario);
+            ps.setString(5, email);
+            ps.setString(6, contrasenia);
+            ps.setString(7, tipoUsuario);
 
-            ps.executeUpdate();
-
-            try (ResultSet rs = ps.getGeneratedKeys()) {
-                if (rs.next()) {
-                    idGenerada = rs.getInt(1);
-                }
+            if (ps.executeUpdate() != 1) {
+                throw new SQLException("No se pudo registrar el usuario.");
             }
         }
-        return idGenerada;
+
+        try (Statement st = conn.createStatement();
+             ResultSet rs = st.executeQuery("SELECT last_insert_rowid()")) {
+
+            if (rs.next()) {
+                return rs.getInt(1);
+            }
+        }
+        throw new SQLException("No se pudo recuperar el ID generado.");
     }
 
+    public static int agregarAdministradorBDD(String nombre, String apellido, String dni, String nombreUsuario, String email, String contrasenia) throws SQLException {
+
+        try (Connection conn = DBHandler.getConnection()) {
+
+            conn.setAutoCommit(false);
+
+            try {
+                int idGenerado = insertarUsuario(conn, nombre, apellido, dni, nombreUsuario, email, contrasenia, "ADMINISTRADOR");
+
+                conn.commit();
+
+                return idGenerado;
+
+            } catch (SQLException | RuntimeException e) {
+
+                try {
+                    conn.rollback();
+                } catch (SQLException rollbackEx) {
+                    e.addSuppressed(rollbackEx);
+                }
+
+                throw e;
+            }
+        }
+    }
+
+    public static int agregarEmpleadoBDD(String nombre, String apellido, String dni, String nombreUsuario, String email, String contrasenia, TipoEmpleado tipoEmpleado, int legajo, BigDecimal pagoPorHora, int horasTrabajadas) throws SQLException {
+
+        try (Connection conn = DBHandler.getConnection()) {
+
+            conn.setAutoCommit(false);
+
+            try {
+
+                int idGenerado = insertarUsuario(conn, nombre, apellido, dni, nombreUsuario, email, contrasenia, "EMPLEADO");
+
+                try (PreparedStatement ps = conn.prepareStatement(INSERT_EMPLEADO)) {
+
+                    ps.setInt(1, idGenerado);
+                    ps.setString(2, tipoEmpleado.name());
+                    ps.setInt(3, legajo);
+                    ps.setBigDecimal(4, pagoPorHora);
+                    ps.setInt(5, horasTrabajadas);
+
+                    if (ps.executeUpdate() != 1) {
+                        throw new SQLException("No se pudo registrar el empleado.");
+                    }
+                }
+
+                conn.commit();
+
+                return idGenerado;
+
+            } catch (SQLException | RuntimeException e) {
+
+                try {
+                    conn.rollback();
+                } catch (SQLException rollbackEx) {
+                    e.addSuppressed(rollbackEx);
+                }
+
+                throw e;
+            }
+        }
+    }
+
+    /*
     //->dependencia del metodo usuarioPorId para instanciar los diferentes tipos de empleados.
     private static Empleado obtenerEmpleado(int id, String nombre, String apellido, String dni, String nombreUsuario, String email, String contrasenia, TipoUsuario tipoUsuario, int legajo, BigDecimal pagoporhora, int horastrabajadas) {
         Empleado empleado = null;
@@ -132,11 +224,12 @@ public class UsuarioDAO {
         }
         return empleado;
     }
+    */
 
-    /// REVISAR1!!!!!!!!!!!!!!!!!!!!!!!!!1111
-    public static Usuario buscarUsuario(String nombreUsuario) throws SQLException{
+    public static Usuario buscarUsuario(String nombreUsuario) throws SQLException {
 
-        try (Connection conn = DBHandler.getConnection(); PreparedStatement ps = conn.prepareStatement(BUSCAR_USUARIO_NOMBRE)) {
+        try (Connection conn = DBHandler.getConnection();
+             PreparedStatement ps = conn.prepareStatement(BUSCAR_USUARIO_NOMBRE)) {
 
             ps.setString(1, nombreUsuario);
 
@@ -151,12 +244,51 @@ public class UsuarioDAO {
                 String apellido = rs.getString("apellido");
                 String dni = rs.getString("dni");
                 String usuario = rs.getString("nombreUsuario");
+                String email = rs.getString("email");
                 String contrasenia = rs.getString("contrasenia");
 
+                String tipoUsuario = rs.getString("tipoUsuario");
+
+                switch (tipoUsuario) {
+
+                    case "ADMINISTRADOR":
+
+                        return new Administrador(
+                                id,
+                                nombre,
+                                apellido,
+                                dni,
+                                usuario,
+                                email,
+                                contrasenia
+                        );
+
+                    case "EMPLEADO":
+
+                        String tipoEmpleadoTexto = rs.getString("tipoEmpleado");
+
+                        if (tipoEmpleadoTexto == null) {
+                            throw new SQLException(
+                                    "El usuario está registrado como empleado, pero no tiene datos de empleado."
+                            );
+                        }
+
+                        TipoEmpleado tipoEmpleado = TipoEmpleado.valueOf(tipoEmpleadoTexto);
+
+                        int legajo = rs.getInt("legajo");
+                        BigDecimal pagoPorHora = rs.getBigDecimal("pagoPorHora");
+                        int horasTrabajadas = rs.getInt("horasTrabajadas");
+
+                        return new Empleado(id, nombre, apellido, dni, usuario, email, contrasenia, tipoEmpleado, legajo, pagoPorHora, horasTrabajadas);
+
+                    default:
+
+                        throw new SQLException(
+                                "Tipo de usuario desconocido: " + tipoUsuario
+                        );
+                }
             }
-
         }
-
     }
 
 }
