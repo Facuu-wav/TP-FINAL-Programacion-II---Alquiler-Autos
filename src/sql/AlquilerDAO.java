@@ -25,11 +25,12 @@ public class AlquilerDAO {
            PreparedStatement statement = connection.prepareStatement(ALQUILERES);
 
            try(ResultSet rs = statement.executeQuery()){
+
                while(rs.next()){
                    int id = rs.getInt("id");
 
                    //-> obtenemos los datos de la RESERVA en particular mediante su clave foranea.
-                   Reserva reserva = rs.getString("reserva"); //FALTA METODO PARA INSTANCIAR EL OBJETO CON SUS DATOS!!!
+                   Reserva reserva = ReservaDAO.reservaPorId(rs.getInt("reserva_id")); //FALTA METODO PARA INSTANCIAR EL OBJETO CON SUS DATOS!!!
 
                    //-> obtenemos los datos del USUARIO en particular mediante su clave foranea.
                    Usuario usuario = UsuarioDAO.usuarioPorId(rs.getInt("id_usuario"));
@@ -45,16 +46,13 @@ public class AlquilerDAO {
                    EstadoAlquiler estadoalquiler = EstadoAlquiler.fromString
                            (rs.getString("estado_alquiler"));
 
-                   Alquileres.add(new Alquiler(id, reserva, usuario, fechaentrega, fechadevolucion, kilometrajeinicial, kilometrajefinal, estadoalquiler))
+                   Alquileres.add(new A(id, reserva, usuario, fechaentrega, fechadevolucion, kilometrajeinicial, kilometrajefinal, estadoalquiler));
 
                }
+
+
            }
-
-
-       }catch (SQLException e){
-           e.printStackTrace();
        }
-
 
        return Alquileres;
     }
