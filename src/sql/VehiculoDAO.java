@@ -1,12 +1,19 @@
 package sql;
 
+import clases.Alquiler;
+import clases.Reserva;
 import clases.Vehiculo;
+import clases.empleados.Usuario;
+import enums.EstadoAlquiler;
 import enums.EstadoVehiculo;
 import enums.Marca;
 import excepciones.IdNoExistenteEx;
+import excepciones.NoExistenElementosCargadosEx;
 
 import java.math.BigDecimal;
 import java.sql.*;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
 
 public class VehiculoDAO {
     //------------------------------------|Querys|------------------------------------
@@ -17,13 +24,17 @@ public class VehiculoDAO {
     private static final String DELETE_VEHICULO =
             "DELETE FROM vehiculo WHERE id = ?";
 
+    private static final String LISTAR_VEHICULOS =
+            "SELECT * FROM vehiculo";
+
+
     private static final String VEHICULO_POR_ID =
             "SELECT * FROM reserva WHERE id = ?";
 
     //------------------------------------|Metodos|------------------------------------
 
     //||OBTENER_VEHICULO_POR_ID||--> Metodo para buscar VEHICULO_POR_ID y retornarlo como objeto..
-    public static Vehiculo vehiculoPorId(int idbuscado) throws SQLException, IdNoExistenteEx {
+    public static Vehiculo vehiculoPorIdBDD(int idbuscado) throws SQLException, IdNoExistenteEx {
         Vehiculo vehiculo = null;
 
         try(Connection connection = DBHandler.getConnection()){
@@ -89,6 +100,46 @@ public class VehiculoDAO {
         return idGenerada;
     }
 
+    //||OBTENER_LISTA_DE_VEHICULOS||--> retorna una lista de los clientes existentes en la base de datos.
+
+    public static ArrayList<Vehiculo> listaVehiculosBDD() throws SQLException, NoExistenElementosCargadosEx, IdNoExistenteEx {
+        ArrayList<Vehiculo> vehiculos = new ArrayList<>();
+
+        try(Connection connection = DBHandler.getConnection();  PreparedStatement statement = connection.prepareStatement(LISTAR_VEHICULOS)) {
+
+            try(ResultSet rs = statement.executeQuery()){
+                while (rs.next()) {
+                    int id = rs.getInt("id");
+
+                    String patente = rs.getString("patente");
+
+                    Marca marca = Marca.fromString
+                            (rs.getString("marca"));
+
+                    String modelo = rs.getString("modelo");
+
+                    int anio = rs.getInt("anio");
+
+                    int kilometraje = rs.getInt("kilometraje");
+
+                    EstadoVehiculo estadoVehiculo = EstadoVehiculo.fromString
+                            (rs.getString("estado_vehiculo"));
+
+                    BigDecimal precioPorDia = rs.getBigDecimal("precio_por_dia");
+
+                    vehiculos.add( new Vehiculo(id, patente, marca, modelo, anio, kilometraje,  estadoVehiculo, precioPorDia));
+
+
+                }
+
+                if(vehiculos.isEmpty())throw new NoExistenElementosCargadosEx("ERROR: no hay datos cargados en el sistema.");
+
+            }
+        }
+
+        return vehiculos;
+    }
+
     /*
     public static boolean eliminarVehiculoBDD(int id) throws SQLException {
 
@@ -106,7 +157,7 @@ public class VehiculoDAO {
     }
     */
 
-    public static void cambiarEstadoVehiculo() {
+    public static void cambiarEstadoVehiculoBDD() {
 
     }
 

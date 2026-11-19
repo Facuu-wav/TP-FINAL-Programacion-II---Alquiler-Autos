@@ -16,10 +16,14 @@ public class UsuarioDAO {
 
     private static final String USUARIO_POR_ID = "SELECT * FROM usuario WHERE id = ?";
 
+    private static final String INSERT_USUARIO = //INCOMPLETA.
+            "INSERT INTO usuario (nombre, apellido, dni, nombreUsuario, email, contrasenia, tipoUsuario, legajo, pagoPorHora,HorasTrabajadas) VALUES (?, ?, ?, ?, ?, ?)";
+    //IMPORTANTE, HAY INCONCISTENCIAS CON LA BASE DE DATOS. LOS ELEMENTOS DE USUARIO NO USAN EL TIPADO STANDARD, estan escritosAsi;
+
     //------------------------------------|Metodos|------------------------------------
 
     //||OBTENER_USUARIO_ID||--> Metodo para buscar USUARIO_POR_ID retornando el objeto encontrado. //PENTDIENTE A REFACTORIZAR
-    public static Usuario usuarioPorId(int idbuscado) throws SQLException, IdNoExistenteEx {
+    public static Usuario usuarioPorIdBDD(int idbuscado) throws SQLException, IdNoExistenteEx {
         Usuario usuario = null;
 
         try (Connection connection = DBHandler.getConnection()) {
@@ -91,7 +95,7 @@ public class UsuarioDAO {
 
         int idGenerada = -1;
 
-        try (Connection conn = DBHandler.getConnection(); PreparedStatement ps = conn.prepareStatement(INSERT_VEHICULO, Statement.RETURN_GENERATED_KEYS)) {
+        try (Connection conn = DBHandler.getConnection(); PreparedStatement ps = conn.prepareStatement(INSERT_USUARIO, Statement.RETURN_GENERATED_KEYS)) {
 
             ps.setString(1, nombre);
             ps.setString(1, apellido);
