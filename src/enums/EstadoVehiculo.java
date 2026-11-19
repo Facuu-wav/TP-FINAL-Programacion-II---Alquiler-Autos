@@ -8,7 +8,7 @@ public enum EstadoVehiculo {
     EN_LIMPIEZA;
 
     // metodo para pasar de string a enum. si recibe un string vacio o nulo entonces retora null
-    public EstadoVehiculo fromString(String strestadovehiculo){
+    public static EstadoVehiculo fromString(String strestadovehiculo){
         if(strestadovehiculo == null || strestadovehiculo.isEmpty() )return null;
 
         String strestadovehiculotrim = strestadovehiculo.trim();
@@ -20,4 +20,6 @@ public enum EstadoVehiculo {
         }
         return null;
     }
+
+
 }

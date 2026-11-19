@@ -20,7 +20,7 @@ public class Alquiler {
 
     private EstadoAlquiler estadoAlquiler;
 
-    /// Constructor/es
+    /// Constructor/ezz
 
     /// Métodos
 
