@@ -21,8 +21,7 @@ public class AlquilerDAO {
     public ArrayList<Alquiler> listaAlquileres() throws SQLException, IdNoExistenteEx {
        ArrayList<Alquiler> Alquileres = new ArrayList<>();
 
-       try(Connection connection = DBHandler.getConnection() ){
-           PreparedStatement statement = connection.prepareStatement(ALQUILERES);
+       try(Connection connection = DBHandler.getConnection();  PreparedStatement statement = connection.prepareStatement(ALQUILERES)) {
 
            try(ResultSet rs = statement.executeQuery()){
                while(rs.next()){

@@ -16,6 +16,15 @@ public class Cliente implements IObtenerID {
     private LocalDate vencimientoLicencia;
 
     /// Constructor/es
+    public Cliente(int id, String nombre, String apellido, String dni, String telefono, String licenciaConducir, LocalDate vencimientoLicencia) {
+        this.id = id;
+        this.nombre = nombre;
+        this.apellido = apellido;
+        this.dni = dni;
+        this.telefono = telefono;
+        this.licenciaConducir = licenciaConducir;
+        this.vencimientoLicencia = vencimientoLicencia;
+    }
 
     /// Getters
     public int getId() {

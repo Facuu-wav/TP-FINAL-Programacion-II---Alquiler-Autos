@@ -1,8 +1,9 @@
 package clases.empleados;
 
 import enums.TipoUsuario;
+import interfaces.IObtenerID;
 
-public abstract class Usuario {
+public abstract class Usuario implements IObtenerID {
 
     // ----------------------------------------------------------|Atributos|----------------------------------------------------------
     private int id;
@@ -91,4 +92,9 @@ public abstract class Usuario {
 
     //----------------------------------------------------------|Métodos|----------------------------------------------------------
 
+
+    @Override
+    public int obtenerID() {
+        return getId();
+    }
 }

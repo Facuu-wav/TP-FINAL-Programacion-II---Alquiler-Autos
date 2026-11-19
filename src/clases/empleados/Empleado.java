@@ -1,6 +1,7 @@
 package clases.empleados;
 
 import enums.TipoUsuario;
+import interfaces.IObtenerID;
 
 import java.math.BigDecimal;
 
@@ -26,6 +27,7 @@ public class Empleado extends Usuario {
     public int getLegajo() {
         return legajo;
     }
+
 
     //----------------------------------------------------------|Metodos|----------------------------------------------------------
 

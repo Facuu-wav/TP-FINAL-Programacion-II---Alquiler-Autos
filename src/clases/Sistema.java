@@ -1,5 +1,6 @@
 package clases;
 
+import clases.empleados.Empleado;
 import clases.empleados.Usuario;
 import enums.EstadoVehiculo;
 import enums.Marca;
@@ -7,26 +8,28 @@ import enums.TipoUsuario;
 import excepciones.AccesoDenegadoEx;
 import excepciones.ContraseniaIncorrectaEx;
 import excepciones.UsuarioNoEncontradoEx;
-import sql.DBHandler;
-import sql.VehiculoDAO;
+import sql.*;
 
 import java.math.BigDecimal;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.HashSet;
+
 
 public class Sistema {
 
     /// Atributos
+    private Gestor<Cliente> clientes;
+    private Gestor<Vehiculo> vehiculos;
+    private Gestor<Empleado> usuarios;
     private Gestor<Reserva> reservas;
     private Gestor<Alquiler> alquileres;
-    private Gestor<Vehiculo> vehiculos;
 
     /// Constructor/es
     public Sistema() {
-        this.reservas = new Gestor<>(new ArrayList<>());
-        this.alquileres = new Gestor<>(new ArrayList<>());
-        this.vehiculos = new Gestor<>(new HashSet<>());
+        this.clientes = new Gestor<>();
+        this.vehiculos = new Gestor<>();
+        this.usuarios = new Gestor<>();
+        this.reservas = new Gestor<>();
+        this.alquileres = new Gestor<>();
     }
 
     /// Métodos
@@ -47,16 +50,21 @@ public class Sistema {
         return usuario;
     }
 
-    public void agregarUsuario() throws AccesoDenegadoEx {
+    public String agregarUsuario() throws AccesoDenegadoEx {
 
+        // validaciones y excepciones acá
+
+        int idGenerada = UsuarioDAO.agregarUsuarioBDD();
+
+        if (idGenerada != -1) {
+            Usuario usuario = new Empleado();
+            usuarios.agregar(usuario);
+            return "Se agregó correctamente el usuario.";
+        }
+        return "No se pudo agregar el usuario.";
     }
 
     public void mostrarPermisos() {
-
-    }
-
-    // Gestión de clientes
-    public void agregarCliente() throws AccesoDenegadoEx {
 
     }
 
@@ -67,6 +75,21 @@ public class Sistema {
             }
         }
         return false;
+    }
+
+    /// Gestión de clientes
+    public String agregarCliente() throws AccesoDenegadoEx {
+
+        // validaciones y excepciones acá
+
+        int idGenerada = ClienteDAO.agregarClienteBDD();
+
+        if (idGenerada != -1) {
+            Cliente cliente = new Cliente();
+            clientes.agregar(cliente);
+            return "Se agregó correctamente el cliente.";
+        }
+        return "No se pudo agregar el cliente.";
     }
 
     /// Gestión de vehículos
@@ -87,7 +110,7 @@ public class Sistema {
             vehiculos.agregar(vehiculo);
             return "Se agregó correctamente el vehículo.";
         }
-        return "No se pudo agregar el vehículo";
+        return "No se pudo agregar el vehículo.";
     }
 
     public void darDeBajaVehiculo(Usuario usuario, int id) throws AccesoDenegadoEx, SQLException {
@@ -102,14 +125,34 @@ public class Sistema {
 
     }
 
-    // Gestión de reservas
-    public void agregarReserva() throws AccesoDenegadoEx {
+    /// Gestión de reservas
+    public String agregarReserva() throws AccesoDenegadoEx {
 
+        // validaciones y excepciones acá
+
+        int idGenerada = ReservaDAO.agregarReservaBDD();
+
+        if (idGenerada != -1) {
+            Reserva reserva = new Reserva();
+            reservas.agregar(reserva);
+            return "Se agregó correctamente la reserva.";
+        }
+        return "No se pudo agregar la reserva";
     }
 
-    // Gestión de alquileres
-    public void agregarAlquiler()  throws AccesoDenegadoEx {
+    /// Gestión de alquileres
+    public String agregarAlquiler()  throws AccesoDenegadoEx {
 
+        // validaciones y excepciones acá
+
+        int idGenerada = AlquilerDAO.agregarAlquilerBDD();
+
+        if (idGenerada != -1) {
+            Alquiler alquiler = new Alquiler();
+            alquileres.agregar(alquiler);
+            return "Se agregó correctamente el alquiler.";
+        }
+        return "No se pudo agregar el alquiler";
     }
 
 }

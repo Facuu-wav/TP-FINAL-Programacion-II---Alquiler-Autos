@@ -2,16 +2,17 @@ package clases;
 
 import interfaces.IObtenerID;
 
-import java.util.Collection;
+import java.util.LinkedHashSet;
+import java.util.Set;
 
 public class Gestor <T extends IObtenerID> {
 
     /// Atributos
-    private Collection<T> elementos;
+    private Set<T> elementos;
 
     /// Constructor/es
-    public Gestor(Collection<T> elementos) {
-        this.elementos = elementos;
+    public Gestor() {
+        this.elementos = new LinkedHashSet<>();
     }
 
     /// Métodos

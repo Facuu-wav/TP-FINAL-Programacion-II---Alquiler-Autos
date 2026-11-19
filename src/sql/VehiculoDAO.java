@@ -104,12 +104,10 @@ public class VehiculoDAO {
                 }
 
                 if (!rs.next()) {
-                    trow new IdNoExistenteEx("ERROR: Ingresar un id existente.");
+                    throw new IdNoExistenteEx("ERROR: Ingresar un id existente.");
                 }
-
             }
         }
-
         return vehiculo;
     }
 
