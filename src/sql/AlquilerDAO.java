@@ -21,7 +21,7 @@ public class AlquilerDAO {
        ArrayList<Alquiler> Alquileres = new ArrayList<>();
 
        try(Connection connection = BDHandler.getConnection() ){
-           PreparedStatement statement = connection.prepareStatement(ALQUILERES, Statement.RETURN_GENERATED_KEYS);
+           PreparedStatement statement = connection.prepareStatement(ALQUILERES);
 
            try(ResultSet rs = statement.executeQuery()){
                while(rs.next()){
