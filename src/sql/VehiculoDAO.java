@@ -9,6 +9,7 @@ import java.math.BigDecimal;
 import java.sql.*;
 
 public class VehiculoDAO {
+    //------------------------------------|Querys|------------------------------------
 
     private static final String INSERT_VEHICULO =
             "INSERT INTO vehiculo (patente, marca, modelo, anio, kilometraje, estado_vehiculo, precio_por_dia) VALUES (?, ?, ?, ?, ?, ?, ?)";
@@ -18,6 +19,8 @@ public class VehiculoDAO {
 
     private static final String VEHICULO_POR_ID =
             "SELECT * FROM reserva WHERE id = ?";
+
+    //------------------------------------|Metodos|------------------------------------
 
     //||OBTENER_VEHICULO_POR_ID||--> Metodo para buscar VEHICULO_POR_ID y retornarlo como objeto..
     public static Vehiculo vehiculoPorId(int idbuscado) throws SQLException, IdNoExistenteEx {

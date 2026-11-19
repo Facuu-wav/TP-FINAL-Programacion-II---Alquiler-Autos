@@ -6,6 +6,7 @@ import clases.Reserva;
 import clases.empleados.Usuario;
 import enums.EstadoAlquiler;
 import excepciones.IdNoExistenteEx;
+import excepciones.NoExistenElementosCargadosEx;
 
 import java.sql.*;
 import java.time.LocalDate;
@@ -67,7 +68,7 @@ public class AlquilerDAO {
 
 
     //||OBTENER_LISTA_DE_ALQUILERES||--> retorna una lista de los clientes existentes en la base de datos.
-    public ArrayList<Alquiler> listaAlquileres() throws SQLException, IdNoExistenteEx {
+    public ArrayList<Alquiler> listaAlquileres() throws SQLException, NoExistenElementosCargadosEx, IdNoExistenteEx {
        ArrayList<Alquiler> Alquileres = new ArrayList<>();
 
        try(Connection connection = DBHandler.getConnection();  PreparedStatement statement = connection.prepareStatement(ALQUILERES)) {
@@ -98,7 +99,8 @@ public class AlquilerDAO {
 
                }
 
-               if(Alquileres.isEmpty())throw new ;
+               if(Alquileres.isEmpty())throw new NoExistenElementosCargadosEx("ERROR: no hay datos cargados en el sistema.");
+
            }
        }
 

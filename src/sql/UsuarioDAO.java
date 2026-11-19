@@ -2,18 +2,21 @@ package sql;
 
 import clases.empleados.Usuario;
 import clases.empleados.*;
+import enums.EstadoVehiculo;
+import enums.Marca;
 import enums.TipoUsuario;
 import excepciones.IdNoExistenteEx;
 
 import java.math.BigDecimal;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 
 public class UsuarioDAO {
 
+    //------------------------------------|Querys|------------------------------------
+
     private static final String USUARIO_POR_ID = "SELECT * FROM usuario WHERE id = ?";
+
+    //------------------------------------|Metodos|------------------------------------
 
     //||OBTENER_USUARIO_ID||--> Metodo para buscar USUARIO_POR_ID retornando el objeto encontrado. //PENTDIENTE A REFACTORIZAR
     public static Usuario usuarioPorId(int idbuscado) throws SQLException, IdNoExistenteEx {
@@ -81,6 +84,31 @@ public class UsuarioDAO {
 
             return usuario;
         }
+    }
+
+    //||AGREGAR_USUARIO||--> Retorna el id generado del objeto agregado a la base de datos.
+    public static int agregarUsuarioBDD(String nombre, String apellido, String dni, String nombreUsuario, String email, String contrasenia) throws SQLException {
+
+        int idGenerada = -1;
+
+        try (Connection conn = DBHandler.getConnection(); PreparedStatement ps = conn.prepareStatement(INSERT_VEHICULO, Statement.RETURN_GENERATED_KEYS)) {
+
+            ps.setString(1, nombre);
+            ps.setString(1, apellido);
+            ps.setString(1, dni);
+            ps.setString(1, nombreUsuario);
+            ps.setString(1, email);
+            ps.setString(1, contrasenia);
+
+            ps.executeUpdate();
+
+            try (ResultSet rs = ps.getGeneratedKeys()) {
+                if (rs.next()) {
+                    idGenerada = rs.getInt(1);
+                }
+            }
+        }
+        return idGenerada;
     }
 
 
