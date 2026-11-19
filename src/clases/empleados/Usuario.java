@@ -1,6 +1,5 @@
 package clases.empleados;
 
-import enums.TipoUsuario;
 import interfaces.IObtenerID;
 
 public abstract class Usuario implements IObtenerID {
@@ -13,11 +12,10 @@ public abstract class Usuario implements IObtenerID {
     private String nombreUsuario;
     private String email;
     private String contrasenia;
-    private TipoUsuario tipoUsuario;
 
     // ----------------------------------------------------------|Constructor/es|----------------------------------------------------------
 
-    public Usuario(int id, String nombre, String apellido, String dni, String nombreUsuario, String email, String contrasenia, TipoUsuario tipoUsuario) {
+    public Usuario(int id, String nombre, String apellido, String dni, String nombreUsuario, String email, String contrasenia) {
         this.id = id;
         this.nombre = nombre;
         this.apellido = apellido;
@@ -25,7 +23,6 @@ public abstract class Usuario implements IObtenerID {
         this.nombreUsuario = nombreUsuario;
         this.email = email;
         this.contrasenia = contrasenia;
-        this.tipoUsuario = tipoUsuario;
     }
 
     //----------------------------------------------------------|Getters|----------------------------------------------------------
@@ -57,10 +54,6 @@ public abstract class Usuario implements IObtenerID {
         return contrasenia;
     }
 
-    public TipoUsuario getTipoUsuario() {
-        return tipoUsuario;
-    }
-
     //----------------------------------------------------------|Setters|----------------------------------------------------------
 
     public void setContrasenia(String contrasenia) {
@@ -89,7 +82,6 @@ public abstract class Usuario implements IObtenerID {
 
 
     //----------------------------------------------------------|Métodos|----------------------------------------------------------
-
 
     @Override
     public int obtenerID() {
