@@ -21,7 +21,7 @@ public class Alquiler implements IObtenerID {
 
     private EstadoAlquiler estadoAlquiler;
 
-    /// Constructor/es
+    /// Constructor/ezz
 
     /// Getters
     public int getId() {

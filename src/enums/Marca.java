@@ -11,7 +11,7 @@ public enum Marca {
     HONDA;
 
     // metodo para pasar de string a enum. si recibe un string vacio o nulo entonces retora null
-    public Marca fromString(String strmarca){
+    public static Marca fromString(String strmarca){
         if(strmarca == null || strmarca.isEmpty() )return null;
 
         String strmarcatrim = strmarca.trim();
