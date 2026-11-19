@@ -39,7 +39,8 @@ public class UsuarioDAO {
 
                     String contrasenia = rs.getString("contrasenia");
 
-                    TipoUsuario tipo_usuario = TipoUsuario.fromString(rs.getString("tipo_usuario"));
+                    TipoUsuario tipo_usuario = TipoUsuario.fromString
+                            (rs.getString("tipo_usuario"));
 
 
                     switch (tipo_usuario) {
@@ -71,14 +72,10 @@ public class UsuarioDAO {
                                 rs.getInt("horas_trabajadas"));
 
                     }
+                } else {
+                    throw new IdNoExistenteEx("ERROR: Ingresar un id existente.");
                 }
 
-                if (!rs.next()) {
-                    trow new IdNoExistenteEx("ERROR: Ingresar un id existente.");
-                }
-
-            } catch (SQLException | IdNoExistenteEx e) {
-                e.printStackTrace();
             }
 
             return usuario;
