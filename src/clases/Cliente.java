@@ -1,8 +1,10 @@
 package clases;
 
+import interfaces.IObtenerID;
+
 import java.time.LocalDate;
 
-public class Cliente {
+public class Cliente implements IObtenerID {
 
     /// Atributos
     private int id;
@@ -13,4 +15,18 @@ public class Cliente {
     private String licenciaConducir;
     private LocalDate vencimientoLicencia;
 
+    /// Constructor/es
+
+    /// Getters
+    public int getId() {
+        return id;
+    }
+
+    /// Setters
+
+    /// Métodos
+    @Override
+    public int obtenerID() {
+        return getId();
+    }
 }

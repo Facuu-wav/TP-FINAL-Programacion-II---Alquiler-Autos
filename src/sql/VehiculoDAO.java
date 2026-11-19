@@ -11,6 +11,9 @@ public class VehiculoDAO {
     private static final String INSERT_VEHICULO =
             "INSERT INTO vehiculo (patente, marca, modelo, anio, kilometraje, estado_vehiculo, precio_por_dia) VALUES (?, ?, ?, ?, ?, ?, ?)";
 
+    private static final String DELETE_VEHICULO =
+            "DELETE FROM vehiculo WHERE id = ?";
+
     public static int agregarVehiculoBDD(String patente, Marca marca, String modelo, int anio, int kilometraje, EstadoVehiculo estadoVehiculo, BigDecimal precioPorDia) throws SQLException {
 
         int idGenerada = -1;
@@ -34,6 +37,27 @@ public class VehiculoDAO {
             }
         }
         return idGenerada;
+    }
+
+    /*
+    public static boolean eliminarVehiculoBDD(int id) throws SQLException {
+
+        boolean eliminado = false;
+
+        try (Connection conn = DBHandler.getConnection(); PreparedStatement ps = conn.prepareStatement(DELETE_VEHICULO)) {
+            ps.setInt(1, id);
+            int filasAfectadas = ps.executeUpdate();
+
+            if (filasAfectadas == 1) {
+                eliminado = true;
+            }
+        }
+        return eliminado;
+    }
+    */
+
+    public static void cambiarEstadoVehiculo() {
+
     }
 
 }

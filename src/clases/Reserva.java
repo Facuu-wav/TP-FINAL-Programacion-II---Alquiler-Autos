@@ -2,11 +2,12 @@ package clases;
 
 import clases.empleados.Usuario;
 import enums.EstadoReserva;
+import interfaces.IObtenerID;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
-public class Reserva {
+public class Reserva implements IObtenerID {
 
     //----------------------------------------------------------|Atributos|----------------------------------------------------------
     private int id;
@@ -98,6 +99,8 @@ public class Reserva {
     }
 
     //----------------------------------------------------------|Métodos|----------------------------------------------------------
-
-
+    @Override
+    public int obtenerID() {
+        return getId();
+    }
 }
