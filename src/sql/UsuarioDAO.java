@@ -2,9 +2,6 @@ package sql;
 
 import clases.empleados.Usuario;
 import clases.empleados.*;
-import enums.EstadoVehiculo;
-import enums.Marca;
-import enums.TipoUsuario;
 import excepciones.IdNoExistenteEx;
 
 import java.math.BigDecimal;
@@ -20,8 +17,11 @@ public class UsuarioDAO {
             "INSERT INTO usuario (nombre, apellido, dni, nombreUsuario, email, contrasenia, tipoUsuario, legajo, pagoPorHora,HorasTrabajadas) VALUES (?, ?, ?, ?, ?, ?)";
     //IMPORTANTE, HAY INCONCISTENCIAS CON LA BASE DE DATOS. LOS ELEMENTOS DE USUARIO NO USAN EL TIPADO STANDARD, estan escritosAsi;
 
-    //------------------------------------|Metodos|------------------------------------
+    private static final String BUSCAR_USUARIO_NOMBRE =
+            "SELECT * FROM usuario WHERE nombreUsuario = ?";
 
+    //------------------------------------|Metodos|------------------------------------
+    
     //||OBTENER_USUARIO_ID||--> Metodo para buscar USUARIO_POR_ID retornando el objeto encontrado. //PENTDIENTE A REFACTORIZAR
     public static Usuario usuarioPorIdBDD(int idbuscado) throws SQLException, IdNoExistenteEx {
         Usuario usuario = null;
@@ -115,7 +115,6 @@ public class UsuarioDAO {
         return idGenerada;
     }
 
-
     //->dependencia del metodo usuarioPorId para instanciar los diferentes tipos de empleados.
     private static Empleado obtenerEmpleado(int id, String nombre, String apellido, String dni, String nombreUsuario, String email, String contrasenia, TipoUsuario tipoUsuario, int legajo, BigDecimal pagoporhora, int horastrabajadas) {
         Empleado empleado = null;
@@ -131,8 +130,34 @@ public class UsuarioDAO {
                     empleado = new EmpleadoVentas(id, nombre, apellido, dni, nombreUsuario, email, contrasenia, tipoUsuario, legajo, pagoporhora, horastrabajadas);
 
         }
-
         return empleado;
     }
+
+    /// REVISAR1!!!!!!!!!!!!!!!!!!!!!!!!!1111
+    public static Usuario buscarUsuario(String nombreUsuario) throws SQLException{
+
+        try (Connection conn = DBHandler.getConnection(); PreparedStatement ps = conn.prepareStatement(BUSCAR_USUARIO_NOMBRE)) {
+
+            ps.setString(1, nombreUsuario);
+
+            try (ResultSet rs = ps.executeQuery()) {
+
+                if (!rs.next()) {
+                    return null;
+                }
+
+                int id = rs.getInt("id");
+                String nombre = rs.getString("nombre");
+                String apellido = rs.getString("apellido");
+                String dni = rs.getString("dni");
+                String usuario = rs.getString("nombreUsuario");
+                String contrasenia = rs.getString("contrasenia");
+
+            }
+
+        }
+
+    }
+
 }
 

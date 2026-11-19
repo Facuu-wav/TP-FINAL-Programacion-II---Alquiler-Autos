@@ -14,6 +14,7 @@ public class Cliente implements IObtenerID {
     private String telefono;
     private String licenciaConducir;
     private LocalDate vencimientoLicencia;
+    private boolean activo;
 
     /// Constructor/es
     public Cliente(int id, String nombre, String apellido, String dni, String telefono, String licenciaConducir, LocalDate vencimientoLicencia) {

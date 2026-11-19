@@ -6,7 +6,7 @@ public enum Marca {
     VOLKSWAGEN,
     CHEVROLET,
     FIAT,
-    REANULT,
+    RENAULT,
     PEUGEOT,
     HONDA;
 

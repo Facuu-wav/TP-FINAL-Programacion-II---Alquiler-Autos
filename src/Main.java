@@ -6,8 +6,8 @@ public class Main {
         Sistema sistema = new Sistema();
 
         try {
-
             sistema.iniciarSesion("ADMIN", "1234");
+
         } catch (Exception e) {
             e.printStackTrace();
         }
