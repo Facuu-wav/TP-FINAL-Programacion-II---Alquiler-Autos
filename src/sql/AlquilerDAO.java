@@ -24,7 +24,7 @@ public class AlquilerDAO {
             "SELECT * FROM cliente WHERE id = ?";
 
     private static final String INSERT_ALQUILER =
-            "INSERT INTO alquiler (reserva_id, usuario_id, fecha_entrega, fechade_volucion, kilometraje_inicial, kilometraje_final, estado_alquiler) VALUES (?, ?, ?, ?, ? ,? ,?)";
+            "INSERT INTO alquiler (reserva_id, usuario_id, fecha_entrega, fecha_devolucion, kilometraje_inicial, kilometraje_final, estado_alquiler) VALUES (?, ?, ?, ?, ? ,? ,?)";
 
 
     //------------------------------------|Metodos|------------------------------------
@@ -38,8 +38,10 @@ public class AlquilerDAO {
 
             ps.setInt(1, reservaid);
             ps.setInt(2, usuarioid);
-            ps.setTimestamp(3, java.sql.Timestamp.valueOf(fechaEntrega));
-            ps.setTimestamp(4, java.sql.Timestamp.valueOf(fechaDevolucion));
+
+            ps.setString(4, fechaEntrega.toString());
+            ps.setString(5, fechaDevolucion.toString());
+
             ps.setInt(5, kilometrajeInicial);
             ps.setInt(6, kilometrajeFinal);
             ps.setString(7, estadoAlquiler.name());
