@@ -5,6 +5,7 @@ import sql.DBHandler;
 import sql.UsuarioDAO;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 
 public class Main {
     static void main(String[] args) {
@@ -18,9 +19,16 @@ public class Main {
             /// Agrega un vehículo
             //System.out.println(sistema.agregarVehiculo("DEF-456", Marca.CHEVROLET, "1", 2004, 1, BigDecimal.valueOf(15000)));
 
+            /// Agrega un cliente
+            //System.out.println(sistema.agregarCliente("john", "doe", "12345678", "223 692-1036", "1234", LocalDate.of(2030,1,1)));
+
+            /// Trae los clientes de la base de datos.
+            //sistema.cargarClientesBDD();
+            //System.out.println(sistema.listarClientesActivos());
+
             /// Trae los vehiculos de la base de datos.
-            sistema.cargarVehiculosBDD();
-            System.out.println(sistema.listarVehiculosActivos());
+            //sistema.cargarVehiculosBDD();
+            //System.out.println(sistema.listarVehiculosActivos());
 
             /// Da de baja un vehiculo por su id
             //sistema.darDeBajaVehiculo(2);

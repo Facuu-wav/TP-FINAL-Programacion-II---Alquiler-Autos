@@ -3,6 +3,7 @@ package clases;
 import interfaces.IObtenerID;
 
 import java.time.LocalDate;
+import java.util.Objects;
 
 public class Cliente implements IObtenerID {
 
@@ -25,6 +26,19 @@ public class Cliente implements IObtenerID {
         this.telefono = telefono;
         this.licenciaConducir = licenciaConducir;
         this.vencimientoLicencia = vencimientoLicencia;
+        this.activo = true;
+    }
+
+    public Cliente(int id, String nombre, String apellido,
+                   String dni, String telefono,
+                   String licenciaConducir,
+                   LocalDate vencimientoLicencia,
+                   boolean activo) {
+
+        this(id, nombre, apellido, dni, telefono,
+                licenciaConducir, vencimientoLicencia);
+
+        this.activo = activo;
     }
 
     /// Getters
@@ -35,8 +49,38 @@ public class Cliente implements IObtenerID {
     /// Setters
 
     /// Métodos
+
+    @Override
+    public String toString() {
+        return "Cliente{" +
+                "id=" + id +
+                ", nombre='" + nombre + '\'' +
+                ", apellido='" + apellido + '\'' +
+                ", dni='" + dni + '\'' +
+                ", telefono='" + telefono + '\'' +
+                ", licenciaConducir='" + licenciaConducir + '\'' +
+                ", vencimientoLicencia=" + vencimientoLicencia +
+                ", activo=" + activo +
+                '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (!(o instanceof Cliente cliente)) return false;
+        return id == cliente.id;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(id);
+    }
+
     @Override
     public int obtenerID() {
         return getId();
+    }
+
+    public boolean isActivo() {
+        return this.activo;
     }
 }

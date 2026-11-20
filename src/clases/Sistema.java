@@ -96,23 +96,46 @@ public class Sistema {
     }
 
     /// Gestión de clientes
-    /*
-    public String agregarCliente() throws AccesoDenegadoEx {
+    public String agregarCliente(String nombre, String apellido, String dni, String telefono, String licenciaConducir, LocalDate vencimientoLicencia) throws AccesoDenegadoEx, SQLException {
 
         if (!esAdministrador(usuarioActual)) {
             throw new AccesoDenegadoEx("Acceso denegado.");
         }
 
-        int idGenerada = ClienteDAO.agregarClienteBDD();
+        int idGenerada = ClienteDAO.agregarClienteBDD( nombre, apellido, dni, telefono, licenciaConducir, vencimientoLicencia);
 
         if (idGenerada != -1) {
-            Cliente cliente = new Cliente();
+            Cliente cliente = new Cliente(idGenerada, nombre, apellido, dni, telefono, licenciaConducir, vencimientoLicencia);
             clientes.agregar(cliente);
             return "Se agregó correctamente el cliente.";
         }
+
         return "No se pudo agregar el cliente.";
     }
-     */
+
+    public StringBuilder listarClientesActivos() {
+
+        StringBuilder sb = new StringBuilder();
+
+        for (Cliente cliente : clientes.obtenerTodos()) {
+
+            if (cliente.isActivo()) {
+                sb.append(cliente).append("\n");
+            }
+        }
+
+        return sb;
+    }
+
+    public void cargarClientesBDD() throws SQLException, NoExistenElementosCargadosEx {
+
+        LinkedHashSet<Cliente> clientesBDD = ClienteDAO.listarClientesBDD();
+
+        for (Cliente cliente : clientesBDD) {
+            clientes.agregar(cliente);
+        }
+    }
+
 
     /// Gestión de vehículos
     public String agregarVehiculo(String patente, Marca marca, String modelo, int anio, int kilometraje, BigDecimal precioPorDia) throws AccesoDenegadoEx, SQLException {

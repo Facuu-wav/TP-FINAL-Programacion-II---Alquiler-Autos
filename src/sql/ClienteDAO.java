@@ -6,11 +6,13 @@ import clases.Reserva;
 import clases.empleados.Usuario;
 import enums.EstadoAlquiler;
 import excepciones.IdNoExistenteEx;
+import excepciones.NoExistenElementosCargadosEx;
 
 import java.sql.*;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.LinkedHashSet;
 
 public class ClienteDAO {
 
@@ -19,11 +21,11 @@ public class ClienteDAO {
     private static final String CLIENTE_POR_ID =
             "SELECT * FROM cliente WHERE id = ?";
 
-    private static final String LISTA_CLIENTES =
+    private static final String LISTAR_CLIENTES =
             "SELECT * FROM cliente; ";
 
     private static final String INSERT_CLIENTE =
-            "INSERT INTO cliente (nombre, apellido, dni, telefono, licencia_conducir, vencimiento_licencia) VALUES (?, ?, ?, ?, ?, ?)";
+            "INSERT INTO cliente (nombre, apellido, dni, telefono, licenciaConducir, vencimientoLicencia) VALUES (?, ?, ?, ?, ?, ?)";
     //------------------------------------|Metodos|------------------------------------
 
     //||AGREGAR_CLIENTES||--> Agrega clientes a la base de datos y retorna el id generado.
@@ -34,11 +36,13 @@ public class ClienteDAO {
         try (Connection conn = DBHandler.getConnection(); PreparedStatement ps = conn.prepareStatement(INSERT_CLIENTE, Statement.RETURN_GENERATED_KEYS)) {
 
             ps.setString(1, nombre);
-            ps.setString(2, apellido); // Utilizo name() en lugar de toString() porque devuelve excatamente el nombre declarado en el enum.
+            ps.setString(2, apellido);
             ps.setString(3, dni);
             ps.setString(4, telefono);
             ps.setString(5, licenciaConducir);
-            ps.setDate(6,  java.sql.Date.valueOf(vencimientoLicencia)); //usamos Date.valueof para pasar el tipo de dato LocalDate a su equivalente en la base de datos (DataTime).
+
+            //ps.setDate(6,  java.sql.Date.valueOf(vencimientoLicencia)); //usamos Date.valueof para pasar el tipo de dato LocalDate a su equivalente en la base de datos (DataTime).
+            ps.setString(6, vencimientoLicencia.toString());
 
             ps.executeUpdate();
 
@@ -52,7 +56,6 @@ public class ClienteDAO {
     }
 
     //|| OBTENER_CLIENTE_POR_ID  ||-->  Metodo para buscar RESERVA_POR_ID retornando el objeto encontrado.
-
     public static Cliente clientePorIdBDD(int idbuscado) throws SQLException, IdNoExistenteEx {
         Cliente cliente = null;
 
@@ -85,39 +88,41 @@ public class ClienteDAO {
                 }
             }
         }
-
         return cliente;
     }
 
 
     //|| OBTENER_LISTA_CLIENTES ||-->  Obtiene lista de clientes de la base de datos.
+    public static LinkedHashSet<Cliente> listarClientesBDD() throws SQLException, NoExistenElementosCargadosEx {
 
-    public static ArrayList<Cliente> listaClientesBDD() throws SQLException, IdNoExistenteEx {
-        ArrayList<Cliente> clientes = new ArrayList<>();
+        LinkedHashSet<Cliente> clientes = new LinkedHashSet<>();
 
-        try(Connection connection = DBHandler.getConnection();  PreparedStatement statement = connection.prepareStatement(LISTA_CLIENTES)) {
+        try (Connection conn = DBHandler.getConnection(); PreparedStatement ps = conn.prepareStatement(LISTAR_CLIENTES); ResultSet rs = ps.executeQuery()) {
 
-            try(ResultSet rs = statement.executeQuery()){
+            while (rs.next()) {
 
-                while(rs.next()){
-                    int id = rs.getInt("id");
+                int id = rs.getInt("id");
+                String nombre = rs.getString("nombre");
+                String apellido = rs.getString("apellido");
+                String dni = rs.getString("dni");
+                String telefono = rs.getString("telefono");
+                String licenciaConducir = rs.getString("licenciaConducir");
 
-                    String nombre = rs.getString("nombre");
+                // LocalDate vencimientoLicencia = rs.getDate("vencimientoLicencia").toLocalDate();
+                LocalDate vencimientoLicencia =
+                        LocalDate.parse(rs.getString("vencimientoLicencia"));
 
-                    String apellido = rs.getString("apellido");
+                boolean activo = rs.getInt("activo") == 1;
 
-                    String dni = rs.getString("dni");
+                Cliente cliente = new Cliente(id, nombre, apellido, dni, telefono, licenciaConducir, vencimientoLicencia, activo);
 
-                    String telefono = rs.getString("telefono");
-
-                    String licenciaConducir = rs.getString("licencia_conducir");
-
-                    LocalDate vencimientoLicencia = rs.getTimestamp("vencimiento_licencia").toLocalDateTime().toLocalDate();
-
-                    listaClientesBDD().add(new Cliente(id, nombre, apellido, dni, telefono, licenciaConducir, vencimientoLicencia));
-
-                }
+                clientes.add(cliente);
             }
+        }
+        if (clientes.isEmpty()) {
+            throw new NoExistenElementosCargadosEx(
+                    "No hay clientes cargados en la base de datos."
+            );
         }
 
         return clientes;
