@@ -116,7 +116,6 @@ public class AlquilerDAO {
         }
     }
 
-    /*
     //|| OBTENER_ALQUILER_POR_ID  ||-->  Metodo para buscar RESERVA_POR_ID retornando el objeto encontrado.
 
     public static Alquiler alquilerPorIdBDD(int idbuscado) throws SQLException, IdNoExistenteEx {
@@ -200,7 +199,5 @@ public class AlquilerDAO {
 
        return Alquileres;
     }
-
-     */
 
 }

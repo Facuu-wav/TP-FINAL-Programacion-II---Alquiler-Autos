@@ -60,8 +60,7 @@ public class ReservaDAO {
         return idGenerada;
     }
 
-    /// mirar
-    /*
+
     //||OBTENER_RESERVA_POR_ID||--> Metodo para buscar RESERVA_POR_ID RETORNANDO EL OBJETO ENCONTRADO.
     public static Reserva reservaPorIdBDD(int idbuscado) throws SQLException, IdNoExistenteEx{
         Reserva reserva = null;
@@ -103,7 +102,7 @@ public class ReservaDAO {
 
         return reserva;
     }
-    */
+
 
     //||OBTENER_LISTA_DE_RESERVAS||--> retorna una lista de las reservas existentes en la base de datos.
     public static LinkedHashSet<Reserva> listarReservasBDD()
@@ -167,47 +166,6 @@ public class ReservaDAO {
         return reservas;
     }
 
-
-
-    /*
-    public static ArrayList<Reserva> listaReservasBDD() throws SQLException, NoExistenElementosCargadosEx, IdNoExistenteEx {
-        ArrayList<Reserva>  reservas = new ArrayList<>();
-
-        try(Connection connection = DBHandler.getConnection();  PreparedStatement statement = connection.prepareStatement(LISTAR_RESERVAS)) {
-
-            try(ResultSet rs = statement.executeQuery()){
-                while (rs.next()) {
-                    int id = rs.getInt("id");
-
-                    Cliente cliente = ClienteDAO.clientePorIdBDD(rs.getInt("cliente_id"));
-
-                    //-> obtenemos el vehiculo en particular de la reserva mediante su clave foranea
-                    Vehiculo vehiculo = VehiculoDAO.vehiculoPorIdBDD(rs.getInt("vehiculo_id"));
-
-                    //-> Mediante la clave foranea accedemos al usuario exacto que hizo la reserva
-                    Usuario usuario = UsuarioDAO.usuarioPorIdBDD(rs.getInt("usuario_id"));
-
-                    LocalDateTime fechareserva = rs.getTimestamp("fecha_reserva").toLocalDateTime();
-
-                    LocalDate fechaInicio = rs.getTimestamp("fecha_inicio").toLocalDateTime().toLocalDate();
-
-                    LocalDate fechafin = rs.getTimestamp("fecha_fin").toLocalDateTime().toLocalDate();
-
-                    EstadoReserva estadoreserva = EstadoReserva.fromString
-                            (rs.getString("estado_reserva"));
-
-                    reservas.add( new Reserva(id, cliente, vehiculo, usuario, fechareserva, fechaInicio, fechafin, estadoreserva));
-
-                }
-
-                if(reservas.isEmpty())throw new NoExistenElementosCargadosEx("ERROR: no hay datos cargados en el sistema.");
-
-            }
-        }
-
-        return reservas;
-    }
-     */
 
 
 }
