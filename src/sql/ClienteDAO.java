@@ -76,10 +76,9 @@ public class ClienteDAO {
 
                     String telefono = rs.getString("telefono");
 
-                    String licenciaConducir = rs.getString("licencia_conducir");
+                    String licenciaConducir = rs.getString("licenciaConducir");
 
-                    LocalDate vencimientoLicencia = rs.getTimestamp("vencimiento_licencia").toLocalDateTime().toLocalDate();
-
+                    LocalDate vencimientoLicencia = rs.getTimestamp("vencimientoLicencia").toLocalDateTime().toLocalDate();
 
                     cliente = new Cliente(id, nombre, apellido, dni, telefono, licenciaConducir, vencimientoLicencia);
 

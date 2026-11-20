@@ -31,6 +31,10 @@ public class Main {
     private static Usuario usuarioActual = null; // usuario con la sesión activa
 
     public static void main(String[] args) {
+
+
+
+
         System.out.println("+================================+");
         System.out.println("|  SISTEMA DE ALQUILER DE AUTOS  |");
         System.out.println("+================================+");
@@ -53,7 +57,7 @@ public class Main {
 
                 cargarDatosIniciales();
 
-                ///
+
                 salir = menuPrincipal();
             }
         }
@@ -163,6 +167,15 @@ public class Main {
     }
 
     private static void mostrarMenu() {
+
+        try {
+            sistema.cargarReservasBDD();
+        } catch (Exception e) {
+            System.out.println("ERROR AL CARGAR LAS RESERVAS:");
+            System.out.println("Tipo de error: " + e.getClass().getName());
+            System.out.println("Mensaje: " + e.getMessage());
+        }
+        System.out.println("RESERVAS:" + sistema.listarReservas());
 
         System.out.println("""
                 

@@ -27,7 +27,7 @@ public class ReservaDAO {
             "SELECT * FROM reserva";
 
     private static final String INSERT_RESERVA =
-            "INSERT INTO reserva (cliente_id, vehiculo_id, usuario_id, fecha_reserva, fecha_inicio, fecha_fin, estado_reserva)(? ,? ,? ,? ,? ,? ,?)";
+            "INSERT INTO reserva (cliente_id, vehiculo_id, usuario_id, fecha_reserva, fecha_inicio, fecha_fin, estado_reserva) VALUES (? ,? ,? ,? ,? ,? ,?)";
 
     //------------------------------------|Metodos|------------------------------------
 
@@ -103,10 +103,9 @@ public class ReservaDAO {
         return reserva;
     }
 
-
     //||OBTENER_LISTA_DE_RESERVAS||--> retorna una lista de las reservas existentes en la base de datos.
     public static LinkedHashSet<Reserva> listarReservasBDD()
-            throws SQLException, NoExistenElementosCargadosEx, IdNoExistenteEx {
+            throws SQLException, IdNoExistenteEx, NoExistenElementosCargadosEx {
 
         LinkedHashSet<Reserva> reservas = new LinkedHashSet<>();
 
@@ -130,14 +129,11 @@ public class ReservaDAO {
                         rs.getInt("usuario_id")
                 );
 
-                LocalDateTime fechaReserva =
-                        LocalDateTime.parse(rs.getString("fecha_reserva"));
+                LocalDateTime fechaReserva = rs.getTimestamp("fecha_reserva").toLocalDateTime();
 
-                LocalDate fechaInicio =
-                        LocalDate.parse(rs.getString("fecha_inicio"));
+                LocalDate fechaInicio = rs.getTimestamp("fecha_inicio").toLocalDateTime().toLocalDate();
 
-                LocalDate fechaFin =
-                        LocalDate.parse(rs.getString("fecha_fin"));
+                LocalDate fechaFin = rs.getTimestamp("fecha_fin").toLocalDateTime().toLocalDate();
 
                 EstadoReserva estadoReserva =
                         EstadoReserva.fromString(rs.getString("estado_reserva"));

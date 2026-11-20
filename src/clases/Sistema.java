@@ -295,6 +295,24 @@ public class Sistema {
         return "Se agregó correctamente la reserva.";
     }
 
+    public void cargarReservasBDD() throws SQLException, NoExistenElementosCargadosEx, IdNoExistenteEx {
+
+        LinkedHashSet<Reserva> reservasBDD = ReservaDAO.listarReservasBDD();
+
+        for (Reserva reserva : reservasBDD) {
+            reservas.agregar(reserva);
+        }
+    }
+
+    public StringBuilder listarReservas() {
+        StringBuilder sb = new StringBuilder();
+
+        for (Reserva reserva : reservas.obtenerTodos()) {
+            sb.append(reserva).append("\n");
+        }
+        return sb;
+    }
+
     /// Gestión de alquileres
 
     /// Cuando se agrega el alquiler es porque se retiró el vehículo
