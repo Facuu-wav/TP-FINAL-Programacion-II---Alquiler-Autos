@@ -28,6 +28,7 @@ public class Main {
 
     private static final Sistema sistema = new Sistema();
     private static boolean datosCargados = false;
+    private static Usuario usuarioActual = null; // usuario con la sesión activa
 
     public static void main(String[] args) {
         System.out.println("+================================+");
@@ -39,13 +40,14 @@ public class Main {
         while (!salir) {
 
             ///||INICIO DE SESION||--> iniciamos sesion al inicio para saber que tipo de privilegios tenemos.
-            Usuario usuario = pantallaLogin();
+            Usuario usuario = pantallaLogin(false);
 
             if (usuario == null) {
                 // Se superaron los intentos o el usuario eligió salir
                 salir = true;
 
             } else {
+                usuarioActual = usuario;
                 System.out.println("\nBienvenido/a " + usuario.getNombre() + " " + usuario.getApellido()
                         + " (" + describirRol(usuario) + ")");
 
@@ -61,17 +63,18 @@ public class Main {
 
     // ----------------------------------------------------------|Login|----------------------------------------------------------
 
-    // Devuelve el usuario logueado, o null si se agotaron los intentos o se eligió salir.
-    private static Usuario pantallaLogin() {
+    // Devuelve el usuario logueado, o null si se agotaron los intentos o se eligió salir/volver atrás.
+    // Si permitirVolver es true, ingresando 0 como usuario se vuelve atrás sin cambiar la sesión.
+    private static Usuario pantallaLogin(boolean permitirVolver) {
 
         System.out.println("+------------------+");
-        System.out.println("| INICIO DE SESIÓN |");
+        System.out.println(permitirVolver ? "| CAMBIO DE SESIÓN |" : "| INICIO DE SESIÓN |");
         System.out.println("+------------------+");
 
 
         for (int intento = 1; intento <= MAX_INTENTOS; intento++) {
 
-            String nombreUsuario = leerTexto("Usuario: ");
+            String nombreUsuario = leerTexto(permitirVolver ? "Usuario (0 para volver atrás): " : "Usuario: ");
 
             if (nombreUsuario.equals("0")) {
                 return null;
@@ -144,11 +147,13 @@ public class Main {
 
             if (opcion == 0) {
                 sistema.cerrarSesion();
+                usuarioActual = null;
                 return true;
             }
 
             if (opcion == 13) {
                 sistema.cerrarSesion();
+                usuarioActual = null;
                 System.out.println("Sesión cerrada.");
                 return false;
             }
@@ -189,6 +194,17 @@ public class Main {
     // Ejecuta la opción elegida. Si el usuario no tiene permisos, Sistema lanza AccesoDenegadoEx.
     private static void ejecutarOpcion(int opcion) {
 
+        // Antes de pedir datos, se verifica el rol. Si no alcanza, se ofrece cambiar de sesión o volver atrás.
+        while (!tienePermiso(opcion)) {
+
+            System.out.println("ACCESO DENEGADO: tu rol (" + describirRol(usuarioActual)
+                    + ") no tiene permisos para esta opción.");
+
+            if (!cambiarSesion()) {
+                return; // volvió atrás: continúa con la sesión actual
+            }
+        }
+
         try {
             switch (opcion) {
                 case 1 -> agregarAdministrador();
@@ -213,6 +229,44 @@ public class Main {
         } catch (Exception e) {
             System.out.println("ERROR: " + e.getMessage());
         }
+    }
+
+    // ----------------------------------------------------------|Permisos y cambio de sesión|----------------------------------------------------------
+
+    private static boolean esAdministrador() {
+        return usuarioActual instanceof Administrador;
+    }
+
+    private static boolean esEmpleadoDeVentas() {
+        return usuarioActual instanceof Empleado empleado && empleado.getTipoEmpleado() == TipoEmpleado.EMPLEADO_VENTAS;
+    }
+
+    // Debe coincidir con las reglas de Sistema (que sigue validando como última barrera).
+    private static boolean tienePermiso(int opcion) {
+        return switch (opcion) {
+            case 1, 2, 3, 5, 6 -> esAdministrador();
+            case 10, 11, 12 -> esAdministrador() || esEmpleadoDeVentas();
+            default -> true;
+        };
+    }
+
+    // Permite iniciar sesión con otro usuario. Devuelve true si se cambió la sesión,
+    // o false si se volvió atrás (o fallaron los intentos) y se continúa con la sesión actual.
+    private static boolean cambiarSesion() {
+
+        System.out.println("Podés iniciar sesión con un usuario autorizado o volver atrás.");
+
+        Usuario nuevo = pantallaLogin(true);
+
+        if (nuevo == null) {
+            System.out.println("Se mantiene la sesión actual (" + usuarioActual.getNombreUsuario() + ").");
+            return false;
+        }
+
+        usuarioActual = nuevo;
+        System.out.println("\nSesión cambiada a " + nuevo.getNombre() + " " + nuevo.getApellido()
+                + " (" + describirRol(nuevo) + ")");
+        return true;
     }
 
     private static String vacioSiNoHay(StringBuilder listado) {
@@ -323,7 +377,7 @@ public class Main {
 
         do {
             System.out.print(mensaje);
-            texto = sc.nextLine().trim();
+            texto = sc.nextLine().trim().replace(" ", "_");
 
             if (texto.isEmpty()) {
                 System.out.println("El campo no puede estar vacío.");
