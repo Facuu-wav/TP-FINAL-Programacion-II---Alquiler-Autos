@@ -6,6 +6,7 @@ import interfaces.IObtenerID;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.Objects;
 
 public class Reserva implements IObtenerID {
 
@@ -99,6 +100,33 @@ public class Reserva implements IObtenerID {
     }
 
     //----------------------------------------------------------|Métodos|----------------------------------------------------------
+
+
+    @Override
+    public String toString() {
+        return "Reserva{" +
+                "id=" + id +
+                ", cliente=" + cliente +
+                ", vehiculo=" + vehiculo +
+                ", usuario=" + usuario +
+                ", fechaReserva=" + fechaReserva +
+                ", fechaInicio=" + fechaInicio +
+                ", fechaFin=" + fechaFin +
+                ", estadoReserva=" + estadoReserva +
+                '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (!(o instanceof Reserva reserva)) return false;
+        return id == reserva.id;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(id);
+    }
+
     @Override
     public int obtenerID() {
         return getId();

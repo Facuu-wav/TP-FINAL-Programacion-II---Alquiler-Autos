@@ -14,6 +14,7 @@ import java.sql.*;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.LinkedHashSet;
 
 public class ReservaDAO {
 
@@ -31,7 +32,6 @@ public class ReservaDAO {
     //------------------------------------|Metodos|------------------------------------
 
     //||AGREGAR_RESERVA||--> Agrega reserva a la base de datos y retorna el id generado.
-
     public static int agregarReservaBDD(int clienteid, int vehiculoid, int usuarioid, LocalDateTime fechaReserva, LocalDate fechaInicio, LocalDate fechaFin, EstadoReserva estadoReserva) throws SQLException {
 
         int idGenerada = -1;
@@ -43,9 +43,9 @@ public class ReservaDAO {
             ps.setInt(2, vehiculoid);
             ps.setInt(3, usuarioid);
 
-            ps.setTimestamp(4, java.sql.Timestamp.valueOf(fechaReserva));
-            ps.setDate(5, java.sql.Date.valueOf(fechaInicio));
-            ps.setDate(6,  java.sql.Date.valueOf(fechaFin));
+            ps.setString(4, fechaReserva.toString());
+            ps.setString(5, fechaInicio.toString());
+            ps.setString(6, fechaFin.toString());
 
             ps.setString(7, estadoReserva.name());
 
@@ -103,12 +103,73 @@ public class ReservaDAO {
 
         return reserva;
     }
-
-
-
-
+    */
+    
     //||OBTENER_LISTA_DE_RESERVAS||--> retorna una lista de las reservas existentes en la base de datos.
+    public static LinkedHashSet<Reserva> listarReservasBDD()
+            throws SQLException, NoExistenElementosCargadosEx, IdNoExistenteEx {
 
+        LinkedHashSet<Reserva> reservas = new LinkedHashSet<>();
+
+        try (Connection conn = DBHandler.getConnection();
+             PreparedStatement ps = conn.prepareStatement(LISTAR_RESERVAS);
+             ResultSet rs = ps.executeQuery()) {
+
+            while (rs.next()) {
+
+                int id = rs.getInt("id");
+
+                Cliente cliente = ClienteDAO.clientePorIdBDD(
+                        rs.getInt("cliente_id")
+                );
+
+                Vehiculo vehiculo = VehiculoDAO.vehiculoPorIdBDD(
+                        rs.getInt("vehiculo_id")
+                );
+
+                Usuario usuario = UsuarioDAO.usuarioPorIdBDD(
+                        rs.getInt("usuario_id")
+                );
+
+                LocalDateTime fechaReserva =
+                        LocalDateTime.parse(rs.getString("fecha_reserva"));
+
+                LocalDate fechaInicio =
+                        LocalDate.parse(rs.getString("fecha_inicio"));
+
+                LocalDate fechaFin =
+                        LocalDate.parse(rs.getString("fecha_fin"));
+
+                EstadoReserva estadoReserva =
+                        EstadoReserva.fromString(rs.getString("estado_reserva"));
+
+                Reserva reserva = new Reserva(
+                        id,
+                        cliente,
+                        vehiculo,
+                        usuario,
+                        fechaReserva,
+                        fechaInicio,
+                        fechaFin,
+                        estadoReserva
+                );
+
+                reservas.add(reserva);
+            }
+        }
+
+        if (reservas.isEmpty()) {
+            throw new NoExistenElementosCargadosEx(
+                    "No hay reservas cargadas en la base de datos."
+            );
+        }
+
+        return reservas;
+    }
+
+
+
+    /*
     public static ArrayList<Reserva> listaReservasBDD() throws SQLException, NoExistenElementosCargadosEx, IdNoExistenteEx {
         ArrayList<Reserva>  reservas = new ArrayList<>();
 
@@ -146,7 +207,6 @@ public class ReservaDAO {
 
         return reservas;
     }
-
      */
 
 

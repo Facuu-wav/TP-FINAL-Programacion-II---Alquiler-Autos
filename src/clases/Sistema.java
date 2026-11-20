@@ -136,7 +136,6 @@ public class Sistema {
         }
     }
 
-
     /// Gestión de vehículos
     public String agregarVehiculo(String patente, Marca marca, String modelo, int anio, int kilometraje, BigDecimal precioPorDia) throws AccesoDenegadoEx, SQLException {
 

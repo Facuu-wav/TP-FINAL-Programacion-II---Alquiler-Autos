@@ -12,7 +12,8 @@ public class UsuarioDAO {
 
     //------------------------------------|Querys|------------------------------------
 
-    private static final String USUARIO_POR_ID = "SELECT * FROM usuario WHERE id = ?";
+    private static final String USUARIO_POR_ID =
+            "SELECT u.id, u.nombre, u.apellido, u.dni, u.nombreUsuario, u.email, u.contrasenia, u.tipoUsuario, e.tipoEmpleado, e.legajo, e.pagoPorHora, e.horasTrabajadas FROM usuario u LEFT JOIN empleado e ON u.id = e.idUsuario WHERE u.id = ?";
 
     private static final String INSERT_USUARIO =
             "INSERT INTO usuario (nombre, apellido, dni, nombreUsuario, email, contrasenia, tipoUsuario) VALUES (?, ?, ?, ?, ?, ?, ?)";
@@ -42,76 +43,77 @@ public class UsuarioDAO {
 
     //------------------------------------|Metodos|------------------------------------
 
-
-    /*
     //||OBTENER_USUARIO_ID||--> Metodo para buscar USUARIO_POR_ID retornando el objeto encontrado. //PENTDIENTE A REFACTORIZAR
-    public static Usuario usuarioPorIdBDD(int idbuscado) throws SQLException, IdNoExistenteEx {
-        Usuario usuario = null;
+    public static Usuario usuarioPorIdBDD(int idBuscado) throws SQLException, IdNoExistenteEx {
 
-        try (Connection connection = DBHandler.getConnection()) {
-            PreparedStatement ps = connection.prepareStatement(USUARIO_POR_ID);
+        try (Connection conn = DBHandler.getConnection(); PreparedStatement ps = conn.prepareStatement(USUARIO_POR_ID)) {
 
-            ps.setInt(1, idbuscado);
+            ps.setInt(1, idBuscado);
 
             try (ResultSet rs = ps.executeQuery()) {
-                if (rs.next()) {
-                    int id = rs.getInt("id");
 
-                    String nombre = rs.getString("nombre");
-
-                    String apellido = rs.getString("apellido");
-
-                    String dni = rs.getString("dni");
-
-                    String nombre_usuario = rs.getString("nombre_usuario");
-
-                    String email = rs.getString("email");
-
-                    String contrasenia = rs.getString("contrasenia");
-
-                    TipoUsuario tipo_usuario = TipoUsuario.fromString
-                            (rs.getString("tipo_usuario"));
-
-
-                    switch (tipo_usuario) {
-                        //->si el usuario es administrador instancia un administrador.
-                        case ADMINISTRADOR -> usuario = new Administrador(
-                                id,
-                                nombre,
-                                apellido,
-                                dni,
-                                nombre_usuario,
-                                email,
-                                contrasenia,
-                                tipo_usuario);
-
-                        //-> si tipo de usuario es algun tipo de empleado entonces instancia el tipo de empleado en particular.
-                        case EMPLEADO_LIMPIEZA,
-                             EMPLEADO_MANTENIMIENTO,
-                             EMPLEADO_VENTAS -> usuario = obtenerEmpleado(
-                                id,
-                                nombre,
-                                apellido,
-                                dni,
-                                nombre_usuario,
-                                email,
-                                contrasenia,
-                                tipo_usuario,
-                                rs.getInt("legajo"),
-                                rs.getBigDecimal("pago_por_hora"),
-                                rs.getInt("horas_trabajadas"));
-
-                    }
-                } else {
-                    throw new IdNoExistenteEx("ERROR: Ingresar un id existente.");
+                if (!rs.next()) {
+                    throw new IdNoExistenteEx(
+                            "No existe un usuario con el ID ingresado."
+                    );
                 }
 
+                return mapearUsuario(rs);
             }
-
-            return usuario;
         }
     }
-     */
+
+    private static Usuario mapearUsuario(ResultSet rs) throws SQLException {
+
+        int id = rs.getInt("id");
+        String nombre = rs.getString("nombre");
+        String apellido = rs.getString("apellido");
+        String dni = rs.getString("dni");
+        String nombreUsuario = rs.getString("nombreUsuario");
+        String email = rs.getString("email");
+        String contrasenia = rs.getString("contrasenia");
+
+        String tipoUsuario = rs.getString("tipoUsuario");
+
+        switch (tipoUsuario) {
+
+            case "ADMINISTRADOR":
+
+                return new Administrador(id, nombre, apellido, dni, nombreUsuario, email, contrasenia);
+
+            case "EMPLEADO":
+
+                String tipoEmpleadoTexto = rs.getString("tipoEmpleado");
+
+                if (tipoEmpleadoTexto == null) {
+                    throw new SQLException(
+                            "El usuario está registrado como empleado, pero no tiene datos de empleado."
+                    );
+                }
+
+                TipoEmpleado tipoEmpleado;
+
+                try {
+                    tipoEmpleado = TipoEmpleado.valueOf(tipoEmpleadoTexto);
+                } catch (IllegalArgumentException e) {
+                    throw new SQLException(
+                            "Tipo de empleado desconocido: " + tipoEmpleadoTexto, e
+                    );
+                }
+
+                int legajo = rs.getInt("legajo");
+                BigDecimal pagoPorHora = rs.getBigDecimal("pagoPorHora");
+                int horasTrabajadas = rs.getInt("horasTrabajadas");
+
+                return new Empleado(id, nombre, apellido, dni, nombreUsuario, email, contrasenia, tipoEmpleado, legajo, pagoPorHora, horasTrabajadas);
+
+            default:
+
+                throw new SQLException(
+                        "Tipo de usuario desconocido: " + tipoUsuario
+                );
+        }
+    }
 
     private static int insertarUsuario(Connection conn, String nombre, String apellido, String dni, String nombreUsuario, String email, String contrasenia, String tipoUsuario) throws SQLException {
 
@@ -206,26 +208,6 @@ public class UsuarioDAO {
         }
     }
 
-    /*
-    //->dependencia del metodo usuarioPorId para instanciar los diferentes tipos de empleados.
-    private static Empleado obtenerEmpleado(int id, String nombre, String apellido, String dni, String nombreUsuario, String email, String contrasenia, TipoUsuario tipoUsuario, int legajo, BigDecimal pagoporhora, int horastrabajadas) {
-        Empleado empleado = null;
-
-        switch (tipoUsuario) {
-            case EMPLEADO_LIMPIEZA ->
-                    empleado = new EmpleadoLimpieza(id, nombre, apellido, dni, nombreUsuario, email, contrasenia, tipoUsuario, legajo, pagoporhora, horastrabajadas);
-
-            case EMPLEADO_MANTENIMIENTO ->
-                    empleado = new EmpleadoMantenimiento(id, nombre, apellido, dni, nombreUsuario, email, contrasenia, tipoUsuario, legajo, pagoporhora, horastrabajadas);
-
-            case EMPLEADO_VENTAS ->
-                    empleado = new EmpleadoVentas(id, nombre, apellido, dni, nombreUsuario, email, contrasenia, tipoUsuario, legajo, pagoporhora, horastrabajadas);
-
-        }
-        return empleado;
-    }
-    */
-
     public static Usuario buscarUsuario(String nombreUsuario) throws SQLException {
 
         try (Connection conn = DBHandler.getConnection();
@@ -253,15 +235,7 @@ public class UsuarioDAO {
 
                     case "ADMINISTRADOR":
 
-                        return new Administrador(
-                                id,
-                                nombre,
-                                apellido,
-                                dni,
-                                usuario,
-                                email,
-                                contrasenia
-                        );
+                        return new Administrador(id, nombre, apellido, dni, usuario, email, contrasenia);
 
                     case "EMPLEADO":
 
