@@ -201,6 +201,20 @@ public class Sistema {
         }
     }
 
+    public StringBuilder listarVehiculosAlquilados() {
+
+        StringBuilder sb = new StringBuilder();
+
+        for (Vehiculo vehiculo : vehiculos.obtenerTodos()) {
+
+            if (vehiculo.getEstadoVehiculo() == EstadoVehiculo.ALQUILADO) {
+                sb.append(vehiculo).append("\n");
+            }
+        }
+
+        return sb;
+    }
+
     public StringBuilder listarVehiculosActivos() {
 
         StringBuilder sb = new StringBuilder();
@@ -208,6 +222,22 @@ public class Sistema {
         for (Vehiculo vehiculo : vehiculos.obtenerTodos()) {
 
             if (vehiculo.getEstadoVehiculo() != EstadoVehiculo.FUERA_DE_SERVICIO) {
+                sb.append(vehiculo).append("\n");
+            }
+        }
+
+        return sb;
+    }
+
+    public StringBuilder listarVehiculosEnPreparacion() {
+
+        StringBuilder sb = new StringBuilder();
+
+        for (Vehiculo vehiculo : vehiculos.obtenerTodos()) {
+
+            if (vehiculo.getEstadoVehiculo() == EstadoVehiculo.EN_MANTENIMIENTO
+                    || vehiculo.getEstadoVehiculo() == EstadoVehiculo.EN_LIMPIEZA) {
+
                 sb.append(vehiculo).append("\n");
             }
         }
@@ -266,6 +296,8 @@ public class Sistema {
     }
 
     /// Gestión de alquileres
+
+    /// Cuando se agrega el alquiler es porque se retiró el vehículo
     public String agregarAlquiler(int idReserva, LocalDateTime fechaEntrega, LocalDateTime fechaDevolucion, int kilometrajeFinal) throws AccesoDenegadoEx, ObjetoNoExisteEx, SQLException {
 
         if (!esAdministrador(usuarioActual) && !tienePermisos(usuarioActual, TipoEmpleado.EMPLEADO_VENTAS)) {
@@ -305,6 +337,12 @@ public class Sistema {
             return "No se pudo agregar el alquiler";
         }
 
+        if (!VehiculoDAO.actualizarEstadoVehiculoBDD(vehiculo.obtenerID(), EstadoVehiculo.ALQUILADO)) {
+            throw new SQLException("No se pudo actualizar el estado del vehículo.");
+        }
+
+        vehiculo.setEstadoVehiculo(EstadoVehiculo.ALQUILADO);
+
         Alquiler alquiler = new Alquiler(idGenerada, reserva, usuario, fechaEntrega, fechaDevolucion, kilomentrajeInicial, kilometrajeFinal, estadoAlquiler);
 
         alquileres.agregar(alquiler);
@@ -312,6 +350,7 @@ public class Sistema {
         return "Se agregó correctamente el alquiler.";
     }
 
+    /// Cuando se finaliza el alquiler es porque el vehículo se devolvió
     public String finalizarAlquiler(int idAlquiler, int kilometrajeFinal, EstadoVehiculo estadoVehiculo) throws AccesoDenegadoEx, ObjetoNoExisteEx, SQLException {
 
         if (!esAdministrador(usuarioActual) && !tienePermisos(usuarioActual, TipoEmpleado.EMPLEADO_VENTAS)) {
