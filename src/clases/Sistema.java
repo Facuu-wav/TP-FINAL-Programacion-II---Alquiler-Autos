@@ -266,22 +266,96 @@ public class Sistema {
     }
 
     /// Gestión de alquileres
-    /*
-    public String agregarAlquiler()  throws AccesoDenegadoEx {
+    public String agregarAlquiler(int idReserva, LocalDateTime fechaEntrega, LocalDateTime fechaDevolucion, int kilometrajeFinal) throws AccesoDenegadoEx, ObjetoNoExisteEx, SQLException {
 
         if (!esAdministrador(usuarioActual) && !tienePermisos(usuarioActual, TipoEmpleado.EMPLEADO_VENTAS)) {
             throw new AccesoDenegadoEx("Acceso denegado.");
         }
 
-        int idGenerada = AlquilerDAO.agregarAlquilerBDD();
+        Reserva reserva = reservas.buscar(idReserva);
 
-        if (idGenerada != -1) {
-            Alquiler alquiler = new Alquiler();
-            alquileres.agregar(alquiler);
-            return "Se agregó correctamente el alquiler.";
+        if (reserva == null) {
+            throw new ObjetoNoExisteEx("La reserva ingresad no existe.");
         }
-        return "No se pudo agregar el alquiler";
+
+        if (reserva.getEstadoReserva() != EstadoReserva.CONFIRMADA) {
+            throw new IllegalArgumentException("La reserva no está confirmada.");
+        }
+
+        Vehiculo vehiculo = reserva.getVehiculo();
+
+        int kilomentrajeInicial = vehiculo.getKilometraje();
+
+        if (fechaEntrega == null || fechaDevolucion == null || !fechaEntrega.isBefore(fechaDevolucion)) {
+            throw new IllegalArgumentException("Las fechas de alquiler no son válidas.");
+        }
+
+        if (kilometrajeFinal < kilomentrajeInicial) {
+            throw new IllegalArgumentException("El kilometraje final no es válido.");
+        }
+
+        Usuario usuario = usuarioActual;
+        int idUsuario = usuario.obtenerID();
+
+        EstadoAlquiler estadoAlquiler = EstadoAlquiler.ACTIVO;
+
+        int idGenerada = AlquilerDAO.agregarAlquilerBDD(idReserva, idUsuario, fechaEntrega, fechaDevolucion, kilomentrajeInicial, kilometrajeFinal, estadoAlquiler);
+
+        if (idGenerada == -1) {
+            return "No se pudo agregar el alquiler";
+        }
+
+        Alquiler alquiler = new Alquiler(idGenerada, reserva, usuario, fechaEntrega, fechaDevolucion, kilomentrajeInicial, kilometrajeFinal, estadoAlquiler);
+
+        alquileres.agregar(alquiler);
+
+        return "Se agregó correctamente el alquiler.";
     }
-     */
+
+    public String finalizarAlquiler(int idAlquiler, int kilometrajeFinal, EstadoVehiculo estadoVehiculo) throws AccesoDenegadoEx, ObjetoNoExisteEx, SQLException {
+
+        if (!esAdministrador(usuarioActual) && !tienePermisos(usuarioActual, TipoEmpleado.EMPLEADO_VENTAS)) {
+            throw new AccesoDenegadoEx("Acceso denegado.");
+        }
+
+        Alquiler alquiler = alquileres.buscar(idAlquiler);
+
+        if (alquiler == null) {
+            throw new ObjetoNoExisteEx("El alquiler ingresado no existe.");
+        }
+
+        if (alquiler.getEstadoAlquiler() != EstadoAlquiler.ACTIVO) {
+            throw new IllegalArgumentException(
+                    "El alquiler no se encuentra activo."
+            );
+        }
+
+        Vehiculo vehiculo = alquiler.getReserva().getVehiculo();
+
+        if (vehiculo.getEstadoVehiculo() != EstadoVehiculo.ALQUILADO) {
+            throw new IllegalArgumentException("El vehículo no se encuentra alquilado.");
+        }
+
+        if (kilometrajeFinal < alquiler.getKilometrajeInicial()) {
+            throw new IllegalArgumentException("El kilometraje final no puede ser inferior al inicial.");
+        }
+
+        if (estadoVehiculo == null || estadoVehiculo == EstadoVehiculo.ALQUILADO || estadoVehiculo == EstadoVehiculo.RESERVADO) {
+            throw  new IllegalArgumentException("El estado indicado no es válido para una devolución.");
+        }
+
+        if (!AlquilerDAO.finalizarAlquilerBDD(idAlquiler, vehiculo.obtenerID(), kilometrajeFinal, estadoVehiculo)) {
+            throw new SQLException("No se pudo finalizar el alquiler");
+        }
+
+        alquiler.setKilometrajeFinal(kilometrajeFinal);
+        alquiler.setEstadoAlquiler(EstadoAlquiler.FINALIZADO);
+
+        vehiculo.setKilometraje(kilometrajeFinal);
+        vehiculo.setEstadoVehiculo(estadoVehiculo);
+
+        return "Se registró correctamente la devolución del vehículo.";
+    }
+
 
 }

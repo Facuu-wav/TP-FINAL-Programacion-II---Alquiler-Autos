@@ -4,6 +4,7 @@ import clases.Alquiler;
 import clases.Reserva;
 import clases.empleados.Usuario;
 import enums.EstadoAlquiler;
+import enums.EstadoVehiculo;
 import excepciones.IdNoExistenteEx;
 import excepciones.NoExistenElementosCargadosEx;
 
@@ -29,7 +30,6 @@ public class AlquilerDAO {
     //------------------------------------|Metodos|------------------------------------
 
     //||AGREGAR_ALQUILERES||--> Agrega alquileres a la base de datos y retorna el id generado.
-
     public static int agregarAlquilerBDD(int reservaid, int usuarioid, LocalDateTime fechaEntrega, LocalDateTime fechaDevolucion, int kilometrajeInicial, int kilometrajeFinal, EstadoAlquiler estadoAlquiler) throws SQLException {
 
         int idGenerada = -1;
@@ -37,17 +37,11 @@ public class AlquilerDAO {
         try (Connection conn = DBHandler.getConnection(); PreparedStatement ps = conn.prepareStatement(INSERT_ALQUILER, Statement.RETURN_GENERATED_KEYS)) {
 
             ps.setInt(1, reservaid);
-
             ps.setInt(2, usuarioid);
-
             ps.setTimestamp(3, java.sql.Timestamp.valueOf(fechaEntrega));
-
             ps.setTimestamp(4, java.sql.Timestamp.valueOf(fechaDevolucion));
-
             ps.setInt(5, kilometrajeInicial);
-
             ps.setInt(6, kilometrajeFinal);
-
             ps.setString(7, estadoAlquiler.name());
 
             ps.executeUpdate();
@@ -59,6 +53,67 @@ public class AlquilerDAO {
             }
         }
         return idGenerada;
+    }
+
+    public static boolean finalizarAlquilerBDD(
+            int idAlquiler,
+            int idVehiculo,
+            int kilometrajeFinal,
+            EstadoVehiculo estadoVehiculo
+    ) throws SQLException {
+
+        String sqlAlquiler = """
+        UPDATE alquiler
+        SET kilometrajeFinal = ?, estadoAlquiler = ?
+        WHERE id = ? AND estadoAlquiler = ?
+        """;
+
+        String sqlVehiculo = """
+        UPDATE vehiculo
+        SET kilometraje = ?, estadoVehiculo = ?
+        WHERE id = ?
+        """;
+
+        try (Connection conn = DBHandler.getConnection()) {
+
+            conn.setAutoCommit(false);
+
+            try {
+                // Actualizar alquiler
+                try (PreparedStatement ps = conn.prepareStatement(sqlAlquiler)) {
+
+                    ps.setInt(1, kilometrajeFinal);
+                    ps.setString(2, EstadoAlquiler.FINALIZADO.name());
+                    ps.setInt(3, idAlquiler);
+                    ps.setString(4, EstadoAlquiler.ACTIVO.name());
+
+                    if (ps.executeUpdate() != 1) {
+                        conn.rollback();
+                        return false;
+                    }
+                }
+
+                // Actualizar vehículo
+                try (PreparedStatement ps = conn.prepareStatement(sqlVehiculo)) {
+
+                    ps.setInt(1, kilometrajeFinal);
+                    ps.setString(2, estadoVehiculo.name());
+                    ps.setInt(3, idVehiculo);
+
+                    if (ps.executeUpdate() != 1) {
+                        conn.rollback();
+                        return false;
+                    }
+                }
+
+                conn.commit();
+                return true;
+
+            } catch (SQLException e) {
+                conn.rollback();
+                throw e;
+            }
+        }
     }
 
     /*

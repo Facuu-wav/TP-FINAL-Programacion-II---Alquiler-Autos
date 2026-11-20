@@ -22,7 +22,6 @@ public class Alquiler implements IObtenerID {
     private EstadoAlquiler estadoAlquiler;
 
     /// Constructor/es
-    ///
     public Alquiler(int id, Reserva reserva, Usuario usuario, LocalDateTime fechaEntrega, LocalDateTime fechaDevolucion, int kilometrajeInicial, int kilometrajeFinal, EstadoAlquiler estadoAlquiler) {
         this.id = id;
         this.reserva = reserva;
@@ -37,6 +36,28 @@ public class Alquiler implements IObtenerID {
     /// Getters
     public int getId() {
         return id;
+    }
+
+    public Reserva getReserva() {
+        return reserva;
+    }
+
+    public int getKilometrajeInicial() {
+        return kilometrajeInicial;
+    }
+
+
+    public EstadoAlquiler getEstadoAlquiler() {
+        return estadoAlquiler;
+    }
+
+    /// Setters
+    public void setKilometrajeFinal(int kilometrajeFinal) {
+        this.kilometrajeFinal = kilometrajeFinal;
+    }
+
+    public void setEstadoAlquiler(EstadoAlquiler estadoAlquiler) {
+        this.estadoAlquiler = estadoAlquiler;
     }
 
     /// Métodos

@@ -104,7 +104,7 @@ public class ReservaDAO {
         return reserva;
     }
     */
-    
+
     //||OBTENER_LISTA_DE_RESERVAS||--> retorna una lista de las reservas existentes en la base de datos.
     public static LinkedHashSet<Reserva> listarReservasBDD()
             throws SQLException, NoExistenElementosCargadosEx, IdNoExistenteEx {
